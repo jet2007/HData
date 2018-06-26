@@ -12,5 +12,11 @@ public class JDBCWriterProperties {
     public static final String SCHEMA = "schema";
     public static final String KEYWORD_ESCAPER = "keyword.escaper";
     public static final String UPSERT_COLUMNS = "upsert.columns";
+    public static final String PRE_SQL = "presql";
+    public static final String POST_SQL = "postsql";
+    
+    
+    public static final String KEYWORD_ESCAPER_DEFAULT = "";
+    public static final int BATCH_INSERT_SIZE_DEFAULT = 10000;
 
 }

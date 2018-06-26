@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +34,7 @@ public class JdbcUtils {
         sql.append(table);
         sql.append(keywordEscaper);
         sql.append(" WHERE 1=2");
-        sql.append(" Limit 1");
+        // sql.append(" Limit 1");
 
         ResultSetHandler<Map<String, Integer>> handler = new ResultSetHandler<Map<String, Integer>>() {
             @Override
@@ -65,8 +66,8 @@ public class JdbcUtils {
         sql.append(keywordEscaper);
         sql.append(table);
         sql.append(keywordEscaper);
-        sql.append(" WHERE 1=2");
-        sql.append(" Limit 1");
+        sql.append(" WHERE ( 1=2 )");
+        // sql.append(" Limit 1");
 
         ResultSetHandler<List<String>> handler = new ResultSetHandler<List<String>>() {
 
@@ -195,8 +196,56 @@ public class JdbcUtils {
         }
     }
 
+    /*
+     * 执行sql语句，不返回结果
+     */
+    public static void executeSqls(Connection connection, String sql) throws SQLException{
+    	Statement sm = connection.createStatement();
+    	String[] sqls = sql.split(";");
+		for (int i = 0; i < sqls.length; i++) {
+			if(sqls[i].trim().length()>0)
+				sm.addBatch(sqls[i]);
+		}
+		sm.executeBatch();
+		sm.close();
+		connection.commit();
+		//connection.close();
+    	
+    }
+    
+    
     public static Connection getConnection(String driverClassName, String url, String username, String password) throws Exception {
         Class.forName(driverClassName);
         return DriverManager.getConnection(url, username, password);
     }
+    
+//    
+//    public static void main(String[] args) {
+//    	try {
+//			Connection conn = getConnection("com.mysql.jdbc.Driver","jdbc:mysql://192.168.101.200:3306/test","root","123456");
+//			Statement sm = conn.createStatement();
+//			String sql1="  UPDATE   tables2 SET  DATA_LENGTH=1+DATA_LENGTH  WHERE AVG_ROW_LENGTH=2179 ;";
+//			String sql2="    UPDATE   tables2   SET  INDEX_LENGTH=2+INDEX_LENGTH    WHERE AVG_ROW_LENGTH=2179 ;";
+//			
+//			String sql=sql1+sql2+sql1+sql2;
+//			String[] sqls = sql.split(";");
+//			for (int i = 0; i < sqls.length; i++) {
+//				if(sqls[i].trim().length()>0)
+//					sm.addBatch(sqls[i]);
+//			} {
+//				
+//			}
+//			
+//			  int[] a = sm.executeBatch();
+// 
+//			System.out.println(a);
+//			sm.close();
+//			conn.close();
+//    	
+//    	} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
+    
 }

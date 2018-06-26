@@ -52,7 +52,7 @@ public class DefaultJobConfig extends JobConfig {
     @Override
     public Reader newReader() {
         String readerClassName = PluginLoader.getReaderClassName(readerName);
-        Preconditions.checkNotNull(readerClassName, "Can not find class for reader: " + readerName);
+        Preconditions.checkNotNull(readerClassName, "Can not find class for reader: " + readerName  + "----" + readerClassName);
 
         try {
             return (Reader) PluginUtils.loadClass(readerName, readerClassName).newInstance();

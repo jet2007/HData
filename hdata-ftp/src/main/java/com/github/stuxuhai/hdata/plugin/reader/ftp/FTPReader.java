@@ -6,10 +6,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream; 
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.net.ftp.FTPClient;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.github.stuxuhai.hdata.api.DefaultRecord;
 import com.github.stuxuhai.hdata.api.Fields;
@@ -21,10 +23,14 @@ import com.github.stuxuhai.hdata.api.Record;
 import com.github.stuxuhai.hdata.api.RecordCollector;
 import com.github.stuxuhai.hdata.api.Splitter;
 import com.github.stuxuhai.hdata.exception.HDataException;
-import com.github.stuxuhai.hdata.ftp.FTPUtils;
+import com.github.stuxuhai.hdata.plugin.utils.ExceptionProperties;
+import com.github.stuxuhai.hdata.plugin.utils.FtpUtils;
+import com.github.stuxuhai.hdata.plugin.utils.impl.FtpUtilsImpl;
+import com.github.stuxuhai.hdata.plugin.utils.impl.SFtpUtilsImpl;
 
-public class FTPReader extends Reader {
-
+public class FtpReader extends Reader {
+	private static final Logger LOGGER = LogManager.getLogger(FtpReader.class);
+	
 	private Fields fields;
 	private String host;
 	private int port;
@@ -34,25 +40,30 @@ public class FTPReader extends Reader {
 	private String encoding;
 	private int fieldsCount;
 	private int startRow;
+	private String compress;
+	private String protocol;
+	
 	private List<String> files = new ArrayList<String>();
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void prepare(JobContext context, PluginConfig readerConfig) {
-		host = readerConfig.getString(FTPReaderProperties.HOST);
-		port = readerConfig.getInt(FTPReaderProperties.PORT, 21);
-		username = readerConfig.getString(FTPReaderProperties.USERNAME, "anonymous");
-		password = readerConfig.getString(FTPReaderProperties.PASSWORD, "");
+		host = readerConfig.getString(FtpReaderProperties.HOST);
+		port = readerConfig.getInt(FtpReaderProperties.PORT, 21);
+		username = readerConfig.getString(FtpReaderProperties.USERNAME, "anonymous");
+		password = readerConfig.getString(FtpReaderProperties.PASSWORD, "");
 		fieldsSeparator = StringEscapeUtils
-				.unescapeJava(readerConfig.getString(FTPReaderProperties.FIELDS_SEPARATOR, "\t"));
-		encoding = readerConfig.getString(FTPReaderProperties.ENCODING, "UTF-8");
-		files = (List<String>) readerConfig.get(FTPReaderProperties.FILES);
-		fieldsCount = readerConfig.getInt(FTPReaderProperties.FIELDS_COUNT, 0);
-		startRow = readerConfig.getInt(FTPReaderProperties.START_ROW, 1);
+				.unescapeJava(readerConfig.getString(FtpReaderProperties.FIELDS_SEPARATOR, "\t"));
+		encoding = readerConfig.getString(FtpReaderProperties.ENCODING, "UTF-8");
+		files = (List<String>) readerConfig.get(FtpReaderProperties.FILES);
+		fieldsCount = readerConfig.getInt(FtpReaderProperties.FIELDS_COUNT, 0);
+		startRow = readerConfig.getInt(FtpReaderProperties.START_ROW, 1);
+		compress = readerConfig.getString(FtpReaderProperties.COMPRESS, "");
+		protocol = readerConfig.getString(FtpReaderProperties.PROTOCOL, "ftp");
 
-		if (readerConfig.containsKey(FTPReaderProperties.SCHEMA)) {
+		if (readerConfig.containsKey(FtpReaderProperties.SCHEMA)) {
 			fields = new Fields();
-			String[] tokens = readerConfig.getString(FTPReaderProperties.SCHEMA).split("\\s*,\\s*");
+			String[] tokens = readerConfig.getString(FtpReaderProperties.SCHEMA).split("\\s*,\\s*");
 			for (String field : tokens) {
 				fields.add(field);
 			}
@@ -61,16 +72,34 @@ public class FTPReader extends Reader {
 
 	@Override
 	public void execute(RecordCollector recordCollector) {
-		FTPClient ftpClient = null;
+		FtpUtils ftp = null;
 		try {
-			ftpClient = FTPUtils.getFtpClient(host, port, username, password);
+			//ftpClient = FTPUtils.getFtpClient(host, port, username, password);
+			if(protocol.equals("ftp")){
+				ftp=new FtpUtilsImpl();
+				ftp.login(host, username, password, port);	
+			}else{
+				ftp=new SFtpUtilsImpl();
+				ftp.login(host, username, password, port);	
+			}
+			
+			
 			for (String file : files) {
-				InputStream is = ftpClient.retrieveFileStream(file);
+				InputStream is = ftp.getFileStream(file);
 				BufferedReader br = null;
-				if (file.endsWith(".gz")) {
+				if (compress.equals("gzip")) {
 					GZIPInputStream gzin = new GZIPInputStream(is);
 					br = new BufferedReader(new InputStreamReader(gzin, encoding));
-				} else {
+				}
+				else if (compress.equals("bzip2")) {
+					BZip2CompressorInputStream gzin = new BZip2CompressorInputStream(is);
+					br = new BufferedReader(new InputStreamReader(gzin, encoding));
+				}
+				else if (compress.equals("zip")) {
+					ZipCycleInputStream zis = new ZipCycleInputStream(is);
+					br = new BufferedReader(new InputStreamReader(zis, encoding));
+				}
+				else {
 					br = new BufferedReader(new InputStreamReader(is, encoding));
 				}
 
@@ -89,14 +118,18 @@ public class FTPReader extends Reader {
 						}
 					}
 				}
-				ftpClient.completePendingCommand();
+				if(protocol.equals("ftp")){
+					ftp.completePendingCommand();
+				}
 				br.close();
 				is.close();
 			}
 		} catch (Exception e) {
+			LOGGER.error(ExceptionProperties.HDATA_FTP_1106 );
 			throw new HDataException(e);
 		} finally {
-			FTPUtils.closeFtpClient(ftpClient);
+			//FTPUtils.closeFtpClient(ftpClient);
+			ftp.close();
 		}
 	}
 
@@ -107,7 +140,7 @@ public class FTPReader extends Reader {
 
 	@Override
 	public Splitter newSplitter() {
-		return new FTPSplitter();
+		return new FtpSplitter();
 	}
 
 }

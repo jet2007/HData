@@ -16,8 +16,13 @@
 		</reader>
 		<reader>
 			<name>ftp</name>
-			<class>com.github.stuxuhai.hdata.plugin.reader.ftp.FTPReader</class>
+			<class>com.github.stuxuhai.hdata.plugin.reader.ftp.FtpReader</class>
 		</reader>
+		<reader>
+			<name>sftp</name>
+			<class>com.github.stuxuhai.hdata.plugin.reader.sftp.SFTPReader</class>
+		</reader>
+		
 		<reader>
 			<name>mongodb</name>
 			<class>com.github.stuxuhai.hdata.plugin.reader.mongodb.MongoDBReader</class>
@@ -67,7 +72,11 @@
 		</writer>
 		<writer>
 			<name>ftp</name>
-			<class>com.github.stuxuhai.hdata.plugin.writer.ftp.FTPWriter</class>
+			<class>com.github.stuxuhai.hdata.plugin.writer.ftp.FtpWriter</class>
+		</writer>
+		<writer>
+			<name>sftp</name>
+			<class>com.github.stuxuhai.hdata.plugin.writer.sftp.SFTPWriter</class>
 		</writer>
 		<writer>
 			<name>mongodb</name>

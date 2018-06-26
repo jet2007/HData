@@ -70,7 +70,7 @@ public class JDBCSplitter extends Splitter {
     @Override
     public List<PluginConfig> split(JobConfig jobConfig) {
         PluginConfig readerConfig = jobConfig.getReaderConfig();
-        String keywordEscaper = readerConfig.getProperty(JDBCReaderProperties.KEYWORD_ESCAPER, "`");
+        String keywordEscaper = readerConfig.getProperty(JDBCReaderProperties.KEYWORD_ESCAPER, JDBCReaderProperties.KEYWORD_ESCAPER_DEFAULT);
         String driver = readerConfig.getString(JDBCReaderProperties.DRIVER);
         Preconditions.checkNotNull(driver, "JDBC reader required property: driver");
 
@@ -80,7 +80,7 @@ public class JDBCSplitter extends Splitter {
         String username = readerConfig.getString(JDBCReaderProperties.USERNAME);
         String password = readerConfig.getString(JDBCReaderProperties.PASSWORD);
         int parallelism = readerConfig.getParallelism();
-        int maxFetchSize = readerConfig.getInt(JDBCReaderProperties.MAX_SIZE_PER_FETCH, 0);
+        int maxFetchSize = readerConfig.getInt(JDBCReaderProperties.MAX_SIZE_PER_FETCH, JDBCReaderProperties.MAX_SIZE_PER_FETCH_DEFAULT);
 
         List<String> sqlList = new ArrayList<String>();
 

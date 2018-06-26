@@ -20,4 +20,8 @@ public class JDBCReaderProperties {
     public static final String FIELD_WRAP_REPLACE_STRING = "field.wrap.replace.string";
     public static final String NUMBER_FORMAT = "number.format";
     public static final String KEYWORD_ESCAPER = "keyword.escaper";
+    
+    
+    public static final String KEYWORD_ESCAPER_DEFAULT = "";
+    public static final int MAX_SIZE_PER_FETCH_DEFAULT = 0;
 }

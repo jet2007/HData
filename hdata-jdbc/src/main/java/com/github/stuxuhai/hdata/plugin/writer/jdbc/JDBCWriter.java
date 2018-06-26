@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,12 +29,13 @@ import com.google.common.base.Preconditions;
 
 public class JDBCWriter extends Writer {
 
-    private static final int DEFAULT_BATCH_INSERT_SIZE = 10000;
+
     private static final Logger LOG = LogManager.getLogger(JDBCWriter.class);
 
     private final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(Constants.DATE_FORMAT_STRING);
 
     private Connection connection;
+    //private Connection conn_init_destroy;
     private PreparedStatement statement;
     private int count;
     private int batchInsertSize;
@@ -42,11 +44,23 @@ public class JDBCWriter extends Writer {
     private List<String> upsertColumns;
     private String table;
     private String keywordEscaper;
+    private String presql;
+    private String postsql;
+    private int parallelism;
     private Map<String, Integer> columnTypes;
+    
+    private String url;
+    private String driver;
+    private String username;
+    private String password ;
+    
+	//标记并发执行时，初始化与destroy的用途；例：写入FTP前的删除原文件；（这一个动作只执行一次）
+	private static AtomicInteger init_seq = new AtomicInteger(0);
+	private static AtomicInteger destroy_seq = new AtomicInteger(0);
 
     @Override
     public void prepare(JobContext context, PluginConfig writerConfig) {
-        this.keywordEscaper = writerConfig.getProperty(JDBCWriterProperties.KEYWORD_ESCAPER, "`");
+        this.keywordEscaper = writerConfig.getProperty(JDBCWriterProperties.KEYWORD_ESCAPER, JDBCWriterProperties.KEYWORD_ESCAPER_DEFAULT);
         this.columns = context.getFields();
 
         this.table = writerConfig.getString(JDBCWriterProperties.TABLE);
@@ -62,13 +76,21 @@ public class JDBCWriter extends Writer {
             this.upsertColumns = Arrays.asList(upsertColumnsStr.trim().split(","));
         }
 
-        this.batchInsertSize = writerConfig.getInt(JDBCWriterProperties.BATCH_INSERT_SIZE, DEFAULT_BATCH_INSERT_SIZE);
+        this.batchInsertSize = writerConfig.getInt(JDBCWriterProperties.BATCH_INSERT_SIZE, JDBCWriterProperties.BATCH_INSERT_SIZE_DEFAULT);
         if (batchInsertSize < 1) {
-            batchInsertSize = DEFAULT_BATCH_INSERT_SIZE;
+            batchInsertSize = JDBCWriterProperties.BATCH_INSERT_SIZE_DEFAULT;
         }
 
         prepareConnection(writerConfig);
-
+        
+		//并行处理前，执行一次INIT操作（只1次）；
+		parallelism = writerConfig.getParallelism();
+		
+		this.presql = writerConfig.getString(JDBCWriterProperties.PRE_SQL);
+		this.postsql = writerConfig.getString(JDBCWriterProperties.POST_SQL);
+		//初始化业务
+		initNonBiz(parallelism,JDBCWriter.init_seq.getAndIncrement());
+        
         try {
             columnTypes = JdbcUtils.getColumnTypes(connection, table, keywordEscaper);
         } catch (Exception e) {
@@ -81,7 +103,7 @@ public class JDBCWriter extends Writer {
         } else if (this.columns != null) {
             insertColumns = this.columns;
         } else {
-            // TODO: read table columns by JDBC
+
             insertColumns = null;
         }
         if (insertColumns != null) {
@@ -90,13 +112,13 @@ public class JDBCWriter extends Writer {
     }
 
     private void prepareConnection(PluginConfig writerConfig) {
-        String url = writerConfig.getString(JDBCWriterProperties.URL);
+        this.url = writerConfig.getString(JDBCWriterProperties.URL);
         Preconditions.checkNotNull(url, "JDBC writer required property: url");
-        String driver = writerConfig.getString(JDBCWriterProperties.DRIVER);
+        this.driver = writerConfig.getString(JDBCWriterProperties.DRIVER);
         Preconditions.checkNotNull(driver, "JDBC writer required property: driver");
 
-        String username = writerConfig.getString(JDBCWriterProperties.USERNAME);
-        String password = writerConfig.getString(JDBCWriterProperties.PASSWORD);
+        this.username = writerConfig.getString(JDBCWriterProperties.USERNAME);
+        this.password = writerConfig.getString(JDBCWriterProperties.PASSWORD);
         try {
             connection = JdbcUtils.getConnection(driver, url, username, password);
             connection.setAutoCommit(false);
@@ -183,6 +205,9 @@ public class JDBCWriter extends Writer {
 
     @Override
     public void close() {
+    	
+    	//int i=JDBCWriter.destroy_seq.get();
+    	//LOG.info("----------close seq=["+i+"] ---------start");
         try {
             if (connection != null && statement != null && count > 0) {
                 statement.executeBatch();
@@ -195,7 +220,115 @@ public class JDBCWriter extends Writer {
         } catch (SQLException e) {
             throw new HDataException(e);
         } finally {
-            DbUtils.closeQuietly(connection);
-        }
+	            DbUtils.closeQuietly(connection);
+        	}
+        //执行完成之后，进行销毁操作
+    	destroyNonBiz(parallelism,JDBCWriter.destroy_seq.getAndIncrement());
+        //LOG.info("----------close seq=["+i+"] ---------end");
     }
+    
+    
+	/*
+	 * 在众多的parallelism线程中；
+	 * 1、只能让线程0进行执行biz工作;
+	 * 2、非0线程需等线程0执行biz完成之后；
+	 */
+	public void initNonBiz(int parallelism,int seq){
+		int i=init_seq.get();
+		//当所有并发数都启动之后，init_seq=parallelism时候
+		while(i<=parallelism){
+			//只让第n个线程，启动业务
+			if(seq==0 && i==parallelism){
+					init();  // 业务处理点
+					init_seq.getAndIncrement(); // 再加1，让其他线程退出
+			}else{
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			i=init_seq.get();
+		}
+	}
+	
+	/*
+	 * INIT-业务，只执行一次 
+	 */
+	public void init(){
+		
+		if(presql!=null && presql.trim().length()>0){
+			try {
+				LOG.info("执行PRESQL=["+presql+"]");
+				JdbcUtils.executeSqls(connection, presql);
+			} catch (SQLException e) {
+				throw new HDataException("HDATA JDBC presql 执行错误", e);
+			}	
+		}
+	}
+	
+	/*
+	 * 销毁操作：前N-1个线程，不执行任何操作；
+	 *       第N个线程，等待所有线程执行完成之后；执行销毁操作
+	 */
+	public void destroyNonBiz(int parall,int seq){
+		if(seq==parall-1){
+	        Connection conn_destroy = null;
+			try {
+				conn_destroy = JdbcUtils.getConnection(driver, url, username, password);
+	            conn_destroy.setAutoCommit(false);
+	            destroy(conn_destroy);
+				conn_destroy.commit();
+				conn_destroy.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+//			int i=destroy_seq.getAndIncrement();
+//			while(i<=parall){
+//				if(i==parall){
+//					destroy(conn_destroy);
+//					try {
+//						conn_destroy.commit();
+//						conn_destroy.close();
+//					} catch (SQLException e) {
+//						e.printStackTrace();
+//					}
+//					destroy_seq.getAndIncrement();
+//				}
+//				else{
+//					try {
+//						Thread.sleep(100);
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
+//				}
+//				i=destroy_seq.get(); 
+//			}
+		}
+		else{
+			// do nothing
+		}
+		
+	
+	}
+	
+	/*
+	 * 销毁-业务，只执行一次 
+	 */
+	public void destroy(Connection conn_destroy){
+		
+		if(postsql!=null && postsql.trim().length()>0){
+			try {
+				LOG.info("执行POSTSQL=["+postsql+"]");
+				JdbcUtils.executeSqls(conn_destroy, postsql);
+				conn_destroy.commit();
+			} catch (SQLException e) {
+				throw new HDataException("HDATA JDBC postsql 执行错误", e);
+			}
+		}
+	}
+	
+
+    
+    
 }

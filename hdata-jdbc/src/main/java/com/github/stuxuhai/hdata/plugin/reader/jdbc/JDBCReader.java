@@ -63,12 +63,21 @@ public class JDBCReader extends Reader {
 
         try {
             connection = JdbcUtils.getConnection(driver, url, username, password);
-            connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-            connection.setReadOnly(true);
+
         } catch (Exception e) {
             throw new HDataException(e);
         }
 
+        
+        try {
+			connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+	        connection.setReadOnly(true);
+		} catch (SQLException e) {
+			LOGGER.info("数据库级别错误或只读错误");
+		}
+
+        
+        
         sqlPiece = (JDBCIterator) readerConfig.get(JDBCReaderProperties.SQL_ITERATOR);
         sqlList = (List<String>) readerConfig.get(JDBCReaderProperties.SQL);
         if (sqlPiece != null) {
