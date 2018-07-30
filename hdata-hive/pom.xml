@@ -69,6 +69,6 @@
 			<artifactId>hadoop-hdfs</artifactId>
 			<version>${hadoop.version}</version>
 			<scope>${hadoop.scope}</scope>
-		</dependency>
+		</dependency> 
 	</dependencies>
 </project>

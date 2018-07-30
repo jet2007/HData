@@ -181,7 +181,7 @@
     * 必选：否 
     * 默认值：没有压缩
 
-* **writeMode**
+* **writemode**
  
     * 描述：FtpWriter写入前数据清理处理模式：示例，当path=/upload/cust.txt时
         * truncate，写入前清理upload目录下cust.txt或cust_NNNN.txt的所有文件。
@@ -190,28 +190,17 @@
     * 必选：否
     * 默认值：nonConflict
 
-* **fieldDelimiter**
-
-    * 描述：读取的字段分隔符 <br />
- 
-    * 必选：否 <br />
- 
-    * 默认值：, <br />
 
 * **compress**
 
-    * 描述：文本压缩类型，暂时不支持。 <br />
- 
-    * 必选：否 <br />
- 
-    * 默认值：无压缩 <br />
+    * 描述：文本压缩类型，默认不填写意味着没有压缩。支持压缩类型为gzip、bzip2
+    * 必选：否 
+    * 默认值：无压缩 
     
 * **encoding**
 
-    * 描述：读取文件的编码配置。<br />
- 
-    * 必选：否 <br />
- 
+    * 描述：读取文件的编码配置。
+    * 必选：否 
     * 默认值：utf-8 <br />
  
 

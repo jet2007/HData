@@ -64,6 +64,21 @@ public class HiveWriter extends Writer {
 		Map<String, String> config = new HashMap<>();
 		config.put(ConfVars.METASTOREURIS.varname, metastoreUris);
 		config.put("hive.start.cleanup.scratchdir", "true");
+		
+		// 解析 set  mapred.output.compression.codec = true语句
+		String hiveSettings = writerConfig.getString(HiveWriterProperties.HIVE_SETTINGS, "");
+		if(hiveSettings.length()>0){
+			String[] sets = hiveSettings.split(";");
+			for (int i = 0; i < sets.length; i++) {
+				String r=sets[i].replaceAll("\t", " ");
+				String val = r.split("=")[1].trim();
+				String rPrev = r.split("=")[0].trim();
+				if(rPrev.toLowerCase().startsWith("set")){
+					String key=rPrev.substring(3).trim();
+					config.put(key, val);
+				}				
+			}
+		}
 
 		WriteEntity.Builder builder = new WriteEntity.Builder()
 						.withDatabase(hiveDatabase)
@@ -169,4 +184,7 @@ public class HiveWriter extends Writer {
 			}
 		}
 	}
+	
+	
+	
 }

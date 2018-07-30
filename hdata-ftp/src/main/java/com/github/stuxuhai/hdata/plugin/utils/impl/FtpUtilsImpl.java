@@ -196,8 +196,19 @@ public class FtpUtilsImpl implements FtpUtils {
 
 	@Override
 	public OutputStream getoutputStream(String fullname) {
+		return getoutputStream(fullname,"insert");
+	}
+	
+	@Override
+	public OutputStream getoutputStream(String fullname, String writeMode) {
 		try {
-			return this.ftp.appendFileStream(fullname);
+			if(writeMode.toLowerCase().equals("overwrite")){
+				return this.ftp.storeFileStream(fullname);
+			}
+			else{
+				return this.ftp.appendFileStream(fullname);
+			}
+			
 		} catch (IOException e) {
 			LOGGER.error(ExceptionProperties.HDATA_FTP_2008 );
 			throw new HDataException(e);

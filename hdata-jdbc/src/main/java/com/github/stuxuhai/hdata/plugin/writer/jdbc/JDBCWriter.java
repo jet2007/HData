@@ -89,7 +89,9 @@ public class JDBCWriter extends Writer {
 		this.presql = writerConfig.getString(JDBCWriterProperties.PRE_SQL);
 		this.postsql = writerConfig.getString(JDBCWriterProperties.POST_SQL);
 		//初始化业务
-		initNonBiz(parallelism,JDBCWriter.init_seq.getAndIncrement());
+		if(presql!=null && presql.trim().length()>0){
+			initNonBiz(parallelism,JDBCWriter.init_seq.getAndIncrement());
+		}
         
         try {
             columnTypes = JdbcUtils.getColumnTypes(connection, table, keywordEscaper);
@@ -171,6 +173,7 @@ public class JDBCWriter extends Writer {
         Arrays.fill(placeholder, "?");
         String sql = String.format("INSERT INTO %s VALUES(%s)", table, Joiner.on(", ").join(placeholder));
         // TODO: Upsert only support mysql for now
+        //LOG.info("----------buildInsertSql:["+ appendMysqlUpsertTail(sql, upsertColumns) +"]");
         return appendMysqlUpsertTail(sql, upsertColumns);
     }
 
@@ -223,7 +226,9 @@ public class JDBCWriter extends Writer {
 	            DbUtils.closeQuietly(connection);
         	}
         //执行完成之后，进行销毁操作
-    	destroyNonBiz(parallelism,JDBCWriter.destroy_seq.getAndIncrement());
+        if(postsql!=null && postsql.trim().length()>0){
+        	destroyNonBiz(parallelism,JDBCWriter.destroy_seq.getAndIncrement());
+        }
         //LOG.info("----------close seq=["+i+"] ---------end");
     }
     
@@ -283,27 +288,6 @@ public class JDBCWriter extends Writer {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-//			int i=destroy_seq.getAndIncrement();
-//			while(i<=parall){
-//				if(i==parall){
-//					destroy(conn_destroy);
-//					try {
-//						conn_destroy.commit();
-//						conn_destroy.close();
-//					} catch (SQLException e) {
-//						e.printStackTrace();
-//					}
-//					destroy_seq.getAndIncrement();
-//				}
-//				else{
-//					try {
-//						Thread.sleep(100);
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					}
-//				}
-//				i=destroy_seq.get(); 
-//			}
 		}
 		else{
 			// do nothing

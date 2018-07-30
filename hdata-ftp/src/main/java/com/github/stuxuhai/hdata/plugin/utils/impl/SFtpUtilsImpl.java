@@ -196,14 +196,25 @@ public class SFtpUtilsImpl implements FtpUtils {
 
 	@Override
 	public OutputStream getoutputStream(String fullname) {
+		return getoutputStream(fullname,"insert");
+		
+	}
+	
+	@Override
+	public OutputStream getoutputStream(String fullname, String writeMode) {
 		try {
-			OutputStream outputStream = this.sftp.put(fullname,ChannelSftp.APPEND);
+			OutputStream outputStream;
+			if(writeMode.toLowerCase().equals("overwrite")){
+				outputStream = this.sftp.put(fullname,ChannelSftp.OVERWRITE);
+				}
+			else{
+				outputStream = this.sftp.put(fullname,ChannelSftp.APPEND);
+			}
 			return outputStream;
 		} catch (SftpException e) {
 			LOGGER.error(ExceptionProperties.HDATA_FTP_1008 );
 			throw new HDataException(e);
 		} 
-		
 	}
 
 }

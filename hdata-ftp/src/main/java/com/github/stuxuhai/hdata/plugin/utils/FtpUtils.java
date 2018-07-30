@@ -48,6 +48,8 @@ public interface FtpUtils {
 	
 	public OutputStream getoutputStream(String fullname);
 	
+	public OutputStream getoutputStream(String fullname,String writeMode);
+	
 	//ftp only
 	public void completePendingCommand();
 	

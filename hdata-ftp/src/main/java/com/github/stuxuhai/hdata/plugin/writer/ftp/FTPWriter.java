@@ -79,7 +79,7 @@ public class FtpWriter extends Writer {
 
 		compress = writerConfig.getString(FtpWriterProperties.COMPRESS,"");
 		protocol = writerConfig.getString(FtpWriterProperties.PROTOCOL,"ftp");
-		writemode = writerConfig.getString(FtpWriterProperties.WRITEMODE,"nonConflict");
+		writemode = writerConfig.getString(FtpWriterProperties.WRITEMODE,"insert");
 		nullvalue = StringEscapeUtils
 				.unescapeJava(writerConfig.getString(FtpWriterProperties.NULLVALUE, "NULL"));
 
@@ -117,7 +117,8 @@ public class FtpWriter extends Writer {
 
 			//写入模式=追加，不做处理
 			//OutputStream outputStream = ftpClient.storeFileStream(path);
-			OutputStream outputStream = ftp.getoutputStream(path);
+			//writemode=overwrite时，使用覆盖写入方式；
+			OutputStream outputStream = ftp.getoutputStream(path,writemode);
 			
 			if (compress.equals("gzip")) {
 				bw = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(outputStream), encoding));
@@ -181,7 +182,7 @@ public class FtpWriter extends Writer {
 	 */
 	public void init(){
 		boolean exists = ftp.isFileExists(path);
-		if(writemode.equals("nonConflict")){
+		if(writemode.toLowerCase().equals("nonconflict")){
 			if(exists){
 				LOGGER.error(ExceptionProperties.HDATA_FTP_1102);
 				throw new HDataException(ExceptionProperties.HDATA_FTP_1102);
