@@ -1,5 +1,6 @@
 package com.github.stuxuhai.hdata.plugin.hive;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import org.apache.hadoop.hive.common.type.HiveBaseChar;
@@ -53,6 +54,8 @@ public class HiveTypeUtils {
 				return 0;
 			}
 			return Integer.parseInt(o.toString());
+		} else if (type.contains("decimal")){
+			return HiveDecimal.create((BigDecimal) o);
 		} else {
 			return toJavaObject(o);
 		}
