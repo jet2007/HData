@@ -31,6 +31,7 @@ public class HDFSReader extends Reader {
 	private Fields fields;
 	private String fieldsSeparator;
 	private String encoding;
+	private String nullFormat;
 	private PluginConfig readerConfig;
 	private List<Path> files = new ArrayList<Path>();
 
@@ -39,10 +40,11 @@ public class HDFSReader extends Reader {
 	public void prepare(JobContext context, PluginConfig readerConfig) {
 		this.readerConfig = readerConfig;
 		fieldsSeparator = StringEscapeUtils
-				.unescapeJava(readerConfig.getString(HDFSReaderProperties.FIELDS_SEPARATOR, "\t"));
+				.unescapeJava(readerConfig.getString(HDFSReaderProperties.FIELDS_SEPARATOR, HDFSReaderProperties.FIELDS_SEPARATOR_DEFAULT));
 		files = (List<Path>) readerConfig.get(HDFSReaderProperties.FILES);
-		encoding = readerConfig.getString(HDFSReaderProperties.ENCODING, "UTF-8");
-
+		encoding = readerConfig.getString(HDFSReaderProperties.ENCODING, HDFSReaderProperties.ENCODING_DEFAULT);
+		this.nullFormat=readerConfig.getString(HDFSReaderProperties.NULL_FORMAT, HDFSReaderProperties.NULL_FORMAT_DEFAULT);
+		
 		String hadoopUser = readerConfig.getString(HDFSReaderProperties.HADOOP_USER);
 		if (hadoopUser != null) {
 			System.setProperty("HADOOP_USER_NAME", hadoopUser);
@@ -83,7 +85,10 @@ public class HDFSReader extends Reader {
 					String[] tokens = StringUtils.splitPreserveAllTokens(line, fieldsSeparator);
 					Record record = new DefaultRecord(tokens.length);
 					for (String field : tokens) {
-						record.add(field);
+						if(!( this.nullFormat.equals(field) ) )
+							record.add(field);
+						else 
+							record.add(null);  // 空值的处理，如出现了\\N，则代表为空值
 					}
 					recordCollector.send(record);
 				}

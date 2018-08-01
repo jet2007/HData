@@ -33,6 +33,8 @@ public class HDFSWriter extends Writer {
 	private String lineSeparator;
 	private String encoding;
 	private String compressCodec;
+	private String nullFormat;
+	
 	private BufferedWriter bw;
 	private String[] strArray;
 	private int fileNum = 0;
@@ -98,14 +100,16 @@ public class HDFSWriter extends Writer {
 		Preconditions.checkNotNull(path, "HDFS writer required property: path");
 
 		fieldsSeparator = StringEscapeUtils
-				.unescapeJava(writerConfig.getString(HDFSWriterProperties.FIELDS_SEPARATOR, "\t"));
+				.unescapeJava(writerConfig.getString(HDFSWriterProperties.FIELDS_SEPARATOR, HDFSWriterProperties.FIELDS_SEPARATOR_DEFAULT));
 		lineSeparator = StringEscapeUtils
-				.unescapeJava(writerConfig.getString(HDFSWriterProperties.LINE_SEPARATOR, "\n"));
-		encoding = writerConfig.getString(HDFSWriterProperties.ENCODING, "UTF-8");
+				.unescapeJava(writerConfig.getString(HDFSWriterProperties.LINE_SEPARATOR, HDFSWriterProperties.LINE_SEPARATOR_DEFAULT));
+		encoding = writerConfig.getString(HDFSWriterProperties.ENCODING, HDFSWriterProperties.ENCODING_DEFAULT);
 		compressCodec = writerConfig.getProperty(HDFSWriterProperties.COMPRESS_CODEC);
-		maxFileBytesSize = writerConfig.getLong(HDFSWriterProperties.MAX_FILE_SIZE_MB, 0) * 1024 * 1024;
-		dateIndex = writerConfig.getInt(HDFSWriterProperties.PARTITION_DATE_INDEX, -1);
+		maxFileBytesSize = writerConfig.getLong(HDFSWriterProperties.MAX_FILE_SIZE_MB, HDFSWriterProperties.MAX_FILE_SIZE_MB_DEFAULT) * 1024 * 1024;
+		dateIndex = writerConfig.getInt(HDFSWriterProperties.PARTITION_DATE_INDEX, HDFSWriterProperties.PARTITION_DATE_INDEX_DEFAULT);
 		dateFormat = writerConfig.getString(HDFSWriterProperties.PARTITIONED_DATE_FORMAT);
+		
+		this.nullFormat=writerConfig.getString(HDFSWriterProperties.NULL_FORMAT,HDFSWriterProperties.NULL_FORMAT_DEFAULT);
 
 		String hadoopUser = writerConfig.getString(HDFSWriterProperties.HADOOP_USER);
 		if (hadoopUser != null) {
@@ -173,7 +177,8 @@ public class HDFSWriter extends Writer {
 		for (int i = 0, len = record.size(); i < len; i++) {
 			Object o = record.get(i);
 			if (o == null) {
-				strArray[i] = "NULL";
+				//strArray[i] = "NULL";
+				strArray[i] = this.nullFormat; //空值处理的地方
 			} else {
 				strArray[i] = o.toString();
 			}
