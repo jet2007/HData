@@ -55,6 +55,9 @@ public class HiveTypeUtils {
 			}
 			return Integer.parseInt(o.toString());
 		} else if (type.contains("decimal")){
+			if (o.toString().isEmpty()) {
+				return 0.0;
+			}
 			return HiveDecimal.create((BigDecimal) o);
 		} else {
 			return toJavaObject(o);
