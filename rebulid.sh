@@ -6,7 +6,7 @@ DIR_BASE="`pwd`"
 mvn clean package -Pmake-package
 
 cd $DIR_BASE
-cd bulid
+cd build
 chmod 777 hdata-0.2.8.tar.gz
 
 rm -rf /app/hdata-0.2.8.tar.gz
