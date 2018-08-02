@@ -9,7 +9,7 @@ cd $DIR_BASE
 cd build
 chmod 777 hdata-0.2.8.tar.gz
 
-rm -rf /app/hdata-0.2.8.tar.gz
+rm -rf $APP/hdata-0.2.8.tar.gz
 cp hdata-0.2.8.tar.gz $APP
 
 cd $APP
