@@ -119,11 +119,11 @@ public class HDFSReader extends Reader {
 	public boolean  isColumnOutput(String includeColumns,String excludeColumns,int colNum) {
 		if(includeColumns == null && excludeColumns==null )
 			return true;
-		else if (!includeColumns.isEmpty()){
+		else if (includeColumns != null && !includeColumns.isEmpty()){
 			includeColumns=(","+includeColumns+",").replaceAll(" ", "");
 			return includeColumns.contains(","+Integer.toString(colNum)+",");
 		}
-		else if (!excludeColumns.isEmpty()){
+		else if (excludeColumns !=null && !excludeColumns.isEmpty()){
 			excludeColumns=(","+excludeColumns+",").replaceAll(" ", "");
 			return !excludeColumns.contains(","+Integer.toString(colNum)+",");
 		}
@@ -135,10 +135,10 @@ public class HDFSReader extends Reader {
 	public int columnOutputLength(String includeColumns,String excludeColumns,int length ) {
 		if(includeColumns == null && excludeColumns==null )
 			return length;
-		else if (!includeColumns.isEmpty()){
+		else if (includeColumns != null && !includeColumns.isEmpty()){
 			return includeColumns.split(",").length;
 		}
-		else if (!excludeColumns.isEmpty()){
+		else if (excludeColumns !=null && !excludeColumns.isEmpty()){
 			return length-excludeColumns.split(",").length;
 		}
 		else 
