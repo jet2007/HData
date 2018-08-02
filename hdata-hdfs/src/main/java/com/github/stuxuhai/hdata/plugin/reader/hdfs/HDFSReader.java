@@ -32,6 +32,8 @@ public class HDFSReader extends Reader {
 	private String fieldsSeparator;
 	private String encoding;
 	private String nullFormat;
+	private String includeColumns;
+	private String excludeColumns;
 	private PluginConfig readerConfig;
 	private List<Path> files = new ArrayList<Path>();
 
@@ -44,6 +46,8 @@ public class HDFSReader extends Reader {
 		files = (List<Path>) readerConfig.get(HDFSReaderProperties.FILES);
 		encoding = readerConfig.getString(HDFSReaderProperties.ENCODING, HDFSReaderProperties.ENCODING_DEFAULT);
 		this.nullFormat=readerConfig.getString(HDFSReaderProperties.NULL_FORMAT, HDFSReaderProperties.NULL_FORMAT_DEFAULT);
+		this.includeColumns=readerConfig.getString(HDFSReaderProperties.INCLUDE_COLUMNS);
+		this.excludeColumns=readerConfig.getString(HDFSReaderProperties.EXCLUDE_COLUMNS);
 		
 		String hadoopUser = readerConfig.getString(HDFSReaderProperties.HADOOP_USER);
 		if (hadoopUser != null) {
@@ -84,12 +88,24 @@ public class HDFSReader extends Reader {
 				while ((line = br.readLine()) != null) {
 					String[] tokens = StringUtils.splitPreserveAllTokens(line, fieldsSeparator);
 					Record record = new DefaultRecord(tokens.length);
-					for (String field : tokens) {
-						if(!( this.nullFormat.equals(field) ) )
-							record.add(field);
-						else 
-							record.add(null);  // 空值的处理，如出现了\\N，则代表为空值
+					
+					//增加取哪些列的判断
+					for (int i = 0; i < tokens.length; i++) {
+						if(isColumnOutput(this.includeColumns,this.excludeColumns,i+1)){
+							if(!( this.nullFormat.equals(tokens[i]) ) )
+								record.add(tokens[i]);
+							else 
+								record.add(null);  // 空值的处理，如出现了\\N，则代表为空值
+						}
+							
 					}
+					//原生
+//					for (String field : tokens) {
+//						if(!( this.nullFormat.equals(field) ) )
+//							record.add(field);
+//						else 
+//							record.add(null);  // 空值的处理，如出现了\\N，则代表为空值
+//					}
 					recordCollector.send(record);
 				}
 				br.close();
@@ -98,6 +114,23 @@ public class HDFSReader extends Reader {
 			throw new HDataException(e);
 		}
 	}
+	
+	//第colNum列是否会被取数的判断
+	public boolean isColumnOutput(String includeColumns,String excludeColumns,int colNum) {
+		if(includeColumns == null && excludeColumns==null )
+			return true;
+		else if (!includeColumns.isEmpty()){
+			includeColumns=(","+includeColumns+",").replaceAll(" ", "");
+			return includeColumns.contains(","+Integer.toString(colNum)+",");
+		}
+		else if (!excludeColumns.isEmpty()){
+			excludeColumns=(","+excludeColumns+",").replaceAll(" ", "");
+			return !excludeColumns.contains(","+Integer.toString(colNum)+",");
+		}
+		else 
+			return true;
+	}
+	
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {

@@ -168,7 +168,7 @@ table|是|表名|
 partitions|否|分区条件，如：day='20140418'|
 hadoop.user|否|具有HDFS写权限的用户名|
 hdfs.conf.path|否|hdfs-site.xml配置文件路径|
-hive.settings|否|hive set语句,分号隔开、如：【set a=1;set b=true;】|
+hive.settings|否|hive set语句，目前作用不明显，可无视；分号隔开、如：【set a=1;set b=true;】|
 
 * **已修复 bug**
 
