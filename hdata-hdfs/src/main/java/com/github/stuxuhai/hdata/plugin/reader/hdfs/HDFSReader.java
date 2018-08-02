@@ -87,6 +87,9 @@ public class HDFSReader extends Reader {
 				}
 				while ((line = br.readLine()) != null) {
 					String[] tokens = StringUtils.splitPreserveAllTokens(line, fieldsSeparator);
+					System.out.println("########"+includeColumns);
+					System.out.println("########"+excludeColumns);
+					
 					Record record = new DefaultRecord(columnOutputLength(this.includeColumns,this.excludeColumns, tokens.length));
 					
 					//增加取哪些列的判断
@@ -133,16 +136,20 @@ public class HDFSReader extends Reader {
 	
 	//需要输出列的长度
 	public int columnOutputLength(String includeColumns,String excludeColumns,int length ) {
-		if(includeColumns == null && excludeColumns==null )
+
+		if(includeColumns == null && excludeColumns==null ) {
 			return length;
+		}
 		else if (includeColumns != null && !includeColumns.isEmpty()){
 			return includeColumns.split(",").length;
 		}
 		else if (excludeColumns !=null && !excludeColumns.isEmpty()){
 			return length-excludeColumns.split(",").length;
 		}
-		else 
+		else {
 			return length;
+		}
+		
 	}
 	
 
