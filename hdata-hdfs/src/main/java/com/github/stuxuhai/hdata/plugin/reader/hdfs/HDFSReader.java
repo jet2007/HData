@@ -118,7 +118,7 @@ public class HDFSReader extends Reader {
 					try {
 						rec[i]=tokens[Integer.parseInt(arr[i])-1];
 					} catch (Exception e) {
-						throw new HDataException(HDFSReaderProperties.ERROR_HDATA_HDFS_1001);
+						throw new HDataException(e);
 					}		
 				}
 			}

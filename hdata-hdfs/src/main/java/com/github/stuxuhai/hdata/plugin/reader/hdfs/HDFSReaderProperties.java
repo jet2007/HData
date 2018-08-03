@@ -26,5 +26,5 @@ public class HDFSReaderProperties {
     
     
     
-    public static final String ERROR_HDATA_HDFS_1001 = "参数COLUMNS有错误";
+    //public static final String ERROR_HDATA_HDFS_1001 = "参数COLUMNS有错误";
 }
