@@ -32,8 +32,7 @@ public class HDFSReader extends Reader {
 	private String fieldsSeparator;
 	private String encoding;
 	private String nullFormat;
-	private String includeColumns;
-	private String excludeColumns;
+	private String columns;
 	private PluginConfig readerConfig;
 	private List<Path> files = new ArrayList<Path>();
 
@@ -46,8 +45,7 @@ public class HDFSReader extends Reader {
 		files = (List<Path>) readerConfig.get(HDFSReaderProperties.FILES);
 		encoding = readerConfig.getString(HDFSReaderProperties.ENCODING, HDFSReaderProperties.ENCODING_DEFAULT);
 		this.nullFormat=readerConfig.getString(HDFSReaderProperties.NULL_FORMAT, HDFSReaderProperties.NULL_FORMAT_DEFAULT);
-		this.includeColumns=readerConfig.getString(HDFSReaderProperties.INCLUDE_COLUMNS);
-		this.excludeColumns=readerConfig.getString(HDFSReaderProperties.EXCLUDE_COLUMNS);
+		this.columns=readerConfig.getString(HDFSReaderProperties.COLUMNS);
 		
 		String hadoopUser = readerConfig.getString(HDFSReaderProperties.HADOOP_USER);
 		if (hadoopUser != null) {
@@ -87,25 +85,14 @@ public class HDFSReader extends Reader {
 				}
 				while ((line = br.readLine()) != null) {
 					String[] tokens = StringUtils.splitPreserveAllTokens(line, fieldsSeparator);
-					Record record = new DefaultRecord(columnOutputLength(this.includeColumns,this.excludeColumns, tokens.length));
-					
-					//增加取哪些列的判断
-					for (int i = 0; i < tokens.length; i++) {
-						if(isColumnOutput(this.includeColumns,this.excludeColumns,i+1)){
-							if(!( this.nullFormat.equals(tokens[i]) ) )
-								record.add(tokens[i]);
-							else 
-								record.add(null);  // 空值的处理，如出现了\\N，则代表为空值
-						}
-							
+					String[] tokensByColumns=getRecordByColumns(tokens);
+					Record record = new DefaultRecord( tokensByColumns.length);
+					for (String field : tokensByColumns) {
+						if(!( this.nullFormat.equals(field) ) )
+							record.add(field);
+						else 
+							record.add(null);  // 空值的处理，如出现了\\N，则代表为空值
 					}
-					//原生
-//					for (String field : tokens) {
-//						if(!( this.nullFormat.equals(field) ) )
-//							record.add(field);
-//						else 
-//							record.add(null);  // 空值的处理，如出现了\\N，则代表为空值
-//					}
 					recordCollector.send(record);
 				}
 				br.close();
@@ -115,39 +102,31 @@ public class HDFSReader extends Reader {
 		}
 	}
 	
-	//第colNum列是否会被取数的判断
-	public boolean  isColumnOutput(String includeColumns,String excludeColumns,int colNum) {
-		if(includeColumns == null && excludeColumns==null )
-			return true;
-		else if (includeColumns != null && !includeColumns.isEmpty()){
-			includeColumns=(","+includeColumns+",").replaceAll(" ", "");
-			return includeColumns.contains(","+Integer.toString(colNum)+",");
+	/*
+	 * 根据原输入与this.columns，返回选取的字段后的输入
+	 */
+	public String[]  getRecordByColumns(String[] tokens) {
+		if(this.columns == null || this.columns.isEmpty())
+			return tokens;
+		else {
+			String[] arr = this.columns.split(",");
+			String[] rec=new String[arr.length];
+			for (int i = 0; i < arr.length; i++) {
+				if(arr[i].startsWith("#"))
+					rec[i]=arr[i].substring(1);
+				else {
+					try {
+						rec[i]=tokens[Integer.parseInt(arr[i])-1];
+					} catch (Exception e) {
+						throw new HDataException(HDFSReaderProperties.ERROR_HDATA_HDFS_1001,e);
+					}		
+				}
+			}
+			return rec;
 		}
-		else if (excludeColumns !=null && !excludeColumns.isEmpty()){
-			excludeColumns=(","+excludeColumns+",").replaceAll(" ", "");
-			return !excludeColumns.contains(","+Integer.toString(colNum)+",");
-		}
-		else 
-			return true;
 	}
 	
-	//需要输出列的长度
-	public int columnOutputLength(String includeColumns,String excludeColumns,int length ) {
 
-		if(includeColumns == null && excludeColumns==null ) {
-			return length;
-		}
-		else if (includeColumns != null && !includeColumns.isEmpty()){
-			return includeColumns.split(",").length;
-		}
-		else if (excludeColumns !=null && !excludeColumns.isEmpty()){
-			return length-excludeColumns.split(",").length;
-		}
-		else {
-			return length;
-		}
-		
-	}
 	
 
 	@Override
