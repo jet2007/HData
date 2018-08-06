@@ -13,8 +13,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.github.stuxuhai.hdata.exception.HDataException;
 import com.github.stuxuhai.hdata.plugin.utils.ExceptionProperties;
-import com.github.stuxuhai.hdata.plugin.utils.FilenameRegexp;
 import com.github.stuxuhai.hdata.plugin.utils.FtpUtils;
+import com.github.stuxuhai.hdata.plugin.writer.ftp.FtpWriterProperties;
 import com.google.common.base.Throwables;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
@@ -119,7 +119,7 @@ public class SFtpUtilsImpl implements FtpUtils {
 
 	@Override
 	public boolean isFileExists(String path, String filename) {
-		String filenameRegexp=FilenameRegexp.getFilenameRegexp(path,filename);
+		String filenameRegexp=FtpWriterProperties.getFilenameRegexp(filename);
 		try {
 			@SuppressWarnings("rawtypes")
 			Vector allFiles = this.sftp.ls(path);
@@ -155,7 +155,7 @@ public class SFtpUtilsImpl implements FtpUtils {
 
 	@Override
 	public boolean deleteFiles(String path, String filename) {
-		String filenameRegexp=FilenameRegexp.getFilenameRegexp(path,filename);
+		String filenameRegexp=FtpWriterProperties.getFilenameRegexp(filename);
 		boolean ret=true;
 		
 		try {

@@ -167,6 +167,7 @@ end.rowkey|否|Rowkey结束值|
 columns|是|读取的列，如：:rowkey,cf:start_ip,cf:end_ip|
 schema|是|输出的字段定义，如：id,start_ip,end_ip|
 zookeeper.znode.parent|否|hbase使用的Zookeeper根节点|
+	
 
 * http
 

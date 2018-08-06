@@ -42,6 +42,7 @@ public class FtpReader extends Reader {
 	private int startRow;
 	private String compress;
 	private String protocol;
+	private String nullFormat;
 	
 	private List<String> files = new ArrayList<String>();
 
@@ -49,17 +50,18 @@ public class FtpReader extends Reader {
 	@Override
 	public void prepare(JobContext context, PluginConfig readerConfig) {
 		host = readerConfig.getString(FtpReaderProperties.HOST);
-		port = readerConfig.getInt(FtpReaderProperties.PORT, 21);
-		username = readerConfig.getString(FtpReaderProperties.USERNAME, "anonymous");
-		password = readerConfig.getString(FtpReaderProperties.PASSWORD, "");
+		port = readerConfig.getInt(FtpReaderProperties.PORT, FtpReaderProperties.PORT_DEFAULT);
+		username = readerConfig.getString(FtpReaderProperties.USERNAME, FtpReaderProperties.USERNAME_DEFAULT);
+		password = readerConfig.getString(FtpReaderProperties.PASSWORD, FtpReaderProperties.PASSWORD_DEFAULT);
 		fieldsSeparator = StringEscapeUtils
-				.unescapeJava(readerConfig.getString(FtpReaderProperties.FIELDS_SEPARATOR, "\t"));
-		encoding = readerConfig.getString(FtpReaderProperties.ENCODING, "UTF-8");
+				.unescapeJava(readerConfig.getString(FtpReaderProperties.FIELDS_SEPARATOR,FtpReaderProperties.FIELDS_SEPARATOR_DEFAULT  ));
+		encoding = readerConfig.getString(FtpReaderProperties.ENCODING,FtpReaderProperties.ENCODING_DEFAULT);
 		files = (List<String>) readerConfig.get(FtpReaderProperties.FILES);
-		fieldsCount = readerConfig.getInt(FtpReaderProperties.FIELDS_COUNT, 0);
-		startRow = readerConfig.getInt(FtpReaderProperties.START_ROW, 1);
-		compress = readerConfig.getString(FtpReaderProperties.COMPRESS, "");
-		protocol = readerConfig.getString(FtpReaderProperties.PROTOCOL, "ftp");
+		fieldsCount = readerConfig.getInt(FtpReaderProperties.FIELDS_COUNT, FtpReaderProperties.FIELDS_COUNT_DEFAULT);
+		startRow = readerConfig.getInt(FtpReaderProperties.START_ROW, FtpReaderProperties.START_ROW_DEFAULT);
+		compress = readerConfig.getString(FtpReaderProperties.COMPRESS,FtpReaderProperties.COMPRESS_DEFAULT);
+		protocol = readerConfig.getString(FtpReaderProperties.PROTOCOL, FtpReaderProperties.PROTOCOL_DEFAULT);
+		username = readerConfig.getString(FtpReaderProperties.NULL_FORMAT, FtpReaderProperties.NULL_FORMAT_DEFAULT);
 
 		if (readerConfig.containsKey(FtpReaderProperties.SCHEMA)) {
 			fields = new Fields();
@@ -112,7 +114,10 @@ public class FtpReader extends Reader {
 						if (tokens.length >= fieldsCount) {
 							Record record = new DefaultRecord(tokens.length);
 							for (String field : tokens) {
-								record.add(field);
+								if(!this.nullFormat.equals(field))
+									record.add(field);
+								else 
+									record.add(null);
 							}
 							recordCollector.send(record);
 						}
@@ -142,5 +147,6 @@ public class FtpReader extends Reader {
 	public Splitter newSplitter() {
 		return new FtpSplitter();
 	}
+	
 
 }

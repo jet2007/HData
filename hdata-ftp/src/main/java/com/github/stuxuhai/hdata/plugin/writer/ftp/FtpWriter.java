@@ -56,7 +56,7 @@ public class FtpWriter extends Writer {
 	
 	//标记并发执行时，初始化与destroy的用途；例：写入FTP前的删除原文件；（这一个动作只执行一次）
 	private static AtomicInteger init_seq = new AtomicInteger(0);
-	private static AtomicInteger destroy_seq = new AtomicInteger(0);
+	//private static AtomicInteger destroy_seq = new AtomicInteger(0);
 	
 	private static final Pattern REG_FILE_PATH_WITHOUT_EXTENSION = Pattern.compile(".*?(?=\\.\\w+$)");
 	private static final Pattern REG_FILE_EXTENSION = Pattern.compile("(\\.\\w+)$");
@@ -66,22 +66,22 @@ public class FtpWriter extends Writer {
 		host = writerConfig.getString(FtpWriterProperties.HOST);
 		Preconditions.checkNotNull(host, "FTP writer required property: host");
 
-		port = writerConfig.getInt(FtpWriterProperties.PORT, 21);
-		username = writerConfig.getString(FtpWriterProperties.USERNAME, "anonymous");
-		password = writerConfig.getString(FtpWriterProperties.PASSWORD, "");
+		port = writerConfig.getInt(FtpWriterProperties.PORT, FtpWriterProperties.PORT_DEFAULT);
+		username = writerConfig.getString(FtpWriterProperties.USERNAME, FtpWriterProperties.USERNAME_DEFAULT);
+		password = writerConfig.getString(FtpWriterProperties.PASSWORD, FtpWriterProperties.PASSWORD_DEFAULT);
 		fieldsSeparator = StringEscapeUtils
-				.unescapeJava(writerConfig.getString(FtpWriterProperties.FIELDS_SEPARATOR, "\t"));
+				.unescapeJava(writerConfig.getString(FtpWriterProperties.FIELDS_SEPARATOR, FtpWriterProperties.FIELDS_SEPARATOR_DEFAULT));
 		lineSeparator = StringEscapeUtils
-				.unescapeJava(writerConfig.getString(FtpWriterProperties.LINE_SEPARATOR, "\n"));
-		encoding = writerConfig.getString(FtpWriterProperties.ENCODING, "UTF-8");
+				.unescapeJava(writerConfig.getString(FtpWriterProperties.LINE_SEPARATOR, FtpWriterProperties.LINE_SEPARATOR_DEFAULT));
+		encoding = writerConfig.getString(FtpWriterProperties.ENCODING, FtpWriterProperties.ENCODING_DEFAULT);
 		path = writerConfig.getString(FtpWriterProperties.PATH);
 		Preconditions.checkNotNull(path, "FTP writer required property: path");
 
-		compress = writerConfig.getString(FtpWriterProperties.COMPRESS,"");
-		protocol = writerConfig.getString(FtpWriterProperties.PROTOCOL,"ftp");
-		writemode = writerConfig.getString(FtpWriterProperties.WRITEMODE,"insert");
+		compress = writerConfig.getString(FtpWriterProperties.COMPRESS,FtpWriterProperties.ENCODING_DEFAULT);
+		protocol = writerConfig.getString(FtpWriterProperties.PROTOCOL,FtpWriterProperties.PROTOCOL_DEFAULT);
+		writemode = writerConfig.getString(FtpWriterProperties.WRITEMODE,FtpWriterProperties.WRITEMODE_DEFAULT);
 		nullvalue = StringEscapeUtils
-				.unescapeJava(writerConfig.getString(FtpWriterProperties.NULLVALUE, "NULL"));
+				.unescapeJava(writerConfig.getString(FtpWriterProperties.NULL_FORMAT, FtpWriterProperties.NULL_FORMAT_DEFAULT));
 
  
 		//ftpClient = FTPUtils.getFtpClient(host, port, username, password);
@@ -115,9 +115,7 @@ public class FtpWriter extends Writer {
 
 		try {
 
-			//写入模式=追加，不做处理
-			//OutputStream outputStream = ftpClient.storeFileStream(path);
-			//writemode=overwrite时，使用覆盖写入方式；
+			//写入模式
 			OutputStream outputStream = ftp.getoutputStream(path,writemode);
 			
 			if (compress.equals("gzip")) {

@@ -26,17 +26,17 @@ public class FtpSplitter extends Splitter {
 		String host = readerConfig.getString(FtpReaderProperties.HOST);
 		Preconditions.checkNotNull(host, "FTP reader required property: host");
 
-		int port = readerConfig.getInt(FtpReaderProperties.PORT, 21);
-		String username = readerConfig.getString(FtpReaderProperties.USERNAME, "anonymous");
-		String password = readerConfig.getString(FtpReaderProperties.PASSWORD, "");
+		int port = readerConfig.getInt(FtpReaderProperties.PORT, FtpReaderProperties.PORT_DEFAULT);
+		String username = readerConfig.getString(FtpReaderProperties.USERNAME, FtpReaderProperties.USERNAME_DEFAULT);
+		String password = readerConfig.getString(FtpReaderProperties.PASSWORD, FtpReaderProperties.PASSWORD_DEFAULT);
 		String dir = readerConfig.getString(FtpReaderProperties.DIR);
 		Preconditions.checkNotNull(dir, "FTP reader required property: dir");
 
 		String filenameRegexp = readerConfig.getString(FtpReaderProperties.FILENAME);
-		String protocol = readerConfig.getString(FtpReaderProperties.PROTOCOL,"ftp");
+		String protocol = readerConfig.getString(FtpReaderProperties.PROTOCOL,FtpReaderProperties.PROTOCOL_DEFAULT);
 		Preconditions.checkNotNull(filenameRegexp, "FTP reader required property: filename");
 
-		boolean recursive = readerConfig.getBoolean(FtpReaderProperties.RECURSIVE, false);
+		boolean recursive = readerConfig.getBoolean(FtpReaderProperties.RECURSIVE, FtpReaderProperties.RECURSIVE_DEFAULT);
 		int parallelism = readerConfig.getParallelism();
 
 		FtpUtils ftp = null;

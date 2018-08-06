@@ -117,6 +117,11 @@
     * 必选：否 
     * 默认值：1
 
+* **null.format**
+
+    * 描述：空值写入ftp文件的填充值。
+    * 必选：否
+    * 默认值：\N
 
 ### 3.2 FtpWriter参数
 
@@ -204,11 +209,11 @@
     * 默认值：utf-8 <br />
  
 
-* **nullvalue**
+* **null.format**
 
     * 描述：空值写入ftp文件的填充值。
     * 必选：否
-    * 默认值：NULL
+    * 默认值：\N
 
 * **parallelism**
 

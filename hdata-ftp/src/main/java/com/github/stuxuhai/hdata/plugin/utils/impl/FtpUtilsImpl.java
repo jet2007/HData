@@ -16,9 +16,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.github.stuxuhai.hdata.exception.HDataException;
 import com.github.stuxuhai.hdata.plugin.utils.ExceptionProperties;
-import com.github.stuxuhai.hdata.plugin.utils.FilenameRegexp;
 import com.github.stuxuhai.hdata.plugin.utils.FtpUtils;
-import com.google.common.base.Throwables;
+import com.github.stuxuhai.hdata.plugin.writer.ftp.FtpWriterProperties;
 
 
 public class FtpUtilsImpl implements FtpUtils {
@@ -75,12 +74,12 @@ public class FtpUtilsImpl implements FtpUtils {
 		try {
 			for (FTPFile ftpFile : this.ftp.listFiles(path)) {
 				
+				//path最后一个字符是/
 				if(path.equals("/")){path="";}
-				else if(path.length()>1&& path.substring(path.length()-1, path.length()).equals("/")){
+				else if(path.length()>1 && path.substring(path.length()-1, path.length()).equals("/")){
 					path=path.substring(0,path.length()-1);
 				}
 				
-				//System.out.println("-------"+path+"/"+ftpFile.getName());
 				if (ftpFile.isFile()) {
 					if (Pattern.matches(filenameRegexp, ftpFile.getName())) {
 						files.add(path + "/" + ftpFile.getName());
@@ -96,6 +95,12 @@ public class FtpUtilsImpl implements FtpUtils {
 			LOGGER.error(ExceptionProperties.HDATA_FTP_2003 );
 			throw new HDataException(e);
 		}
+		
+		files =null;
+		for (String string : files) {
+			System.out.println("##############:["+ string +"]");
+		}
+		
 		
 		return files;
 	}
@@ -115,7 +120,7 @@ public class FtpUtilsImpl implements FtpUtils {
 
 	@Override
 	public boolean isFileExists(String path, String filename) {
-		String filenameRegexp=FilenameRegexp.getFilenameRegexp(path,filename);
+		String filenameRegexp=FtpWriterProperties.getFilenameRegexp(filename);
 		try {
 			for (FTPFile ftpFile : this.ftp.listFiles(path)) {
 				//System.out.println(ftpFile.getName());
@@ -151,16 +156,11 @@ public class FtpUtilsImpl implements FtpUtils {
 
 	@Override
 	public boolean deleteFiles(String path, String filename) {
-		//System.out.println("############################*********:"+path+"/"+filename);
-		
-		String filenameRegexp=FilenameRegexp.getFilenameRegexp(path,filename);
+		String filenameRegexp=FtpWriterProperties.getFilenameRegexp(filename);
 		try {
 			for (FTPFile ftpFile : this.ftp.listFiles(path)) {
 				if (ftpFile.isFile()) {
 					if (Pattern.matches(filenameRegexp, ftpFile.getName())) {
-						//System.out.println("############################*********");
-						//System.out.println("############################*********:"+path+"/"+ftpFile.getName());
-						//System.out.println("############################*********");
 						this.ftp.deleteFile(path+"/"+ftpFile.getName());
 					}
 				}  
@@ -214,6 +214,8 @@ public class FtpUtilsImpl implements FtpUtils {
 			throw new HDataException(e);
 		}
 	}
+	
+
 	
 	
 //	public static void main(String[] args) {

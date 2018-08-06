@@ -80,12 +80,12 @@ public class HBaseWriter extends Writer {
 			if (i != rowkeyIndex) {
 				String[] tokens = columns[i].split(":");
 				//null时不写入hbase
-				if(this.nullFormat.equals("null")) {
+				if(this.nullFormat.equals("\null")) {
 					if(record.get(i)!=null) // 值为空时，不写入HBASE
 						put.addColumn(Bytes.toBytes(tokens[0]), Bytes.toBytes(tokens[1]), Bytes.toBytes(record.get(i).toString()));
 				}
 				//none写入空
-				else if (this.nullFormat.equals("none")){
+				else if (this.nullFormat.equals("\none")){
 					put.addColumn(Bytes.toBytes(tokens[0]), Bytes.toBytes(tokens[1]),
 							record.get(i) == null ? null : Bytes.toBytes(record.get(i).toString()));
 				}
