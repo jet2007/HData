@@ -96,7 +96,6 @@ public class FtpUtilsImpl implements FtpUtils {
 			throw new HDataException(e);
 		}
 		
-		files =null;
 		for (String string : files) {
 			System.out.println("##############:["+ string +"]");
 		}
