@@ -27,6 +27,7 @@ public class HBaseWriter extends Writer {
 	private int rowkeyIndex = -1;
 	private final List<Put> putList = new ArrayList<Put>();
 	private String[] columns;
+	private String nullFormat;
 	private static final String ROWKEY = ":rowkey";
 
 	@Override
@@ -44,7 +45,8 @@ public class HBaseWriter extends Writer {
 		conf.set("hbase.zookeeper.property.clientPort",
 				writerConfig.getString(HBaseWriterProperties.ZOOKEEPER_PROPERTY_CLIENTPORT, "2181"));
 		batchSize = writerConfig.getInt(HBaseWriterProperties.BATCH_INSERT_SIZE, 10000);
-
+		this.nullFormat = writerConfig.getString(HBaseWriterProperties.NULL_FORMAT,HBaseWriterProperties.NULL_FORMAT_DEFAULT);
+		
 		Preconditions.checkNotNull(writerConfig.getString(HBaseWriterProperties.COLUMNS),
 				"HBase writer required property: zookeeper.columns");
 		columns = writerConfig.getString(HBaseWriterProperties.COLUMNS).split(",");
@@ -77,8 +79,19 @@ public class HBaseWriter extends Writer {
 		for (int i = 0, len = record.size(); i < len; i++) {
 			if (i != rowkeyIndex) {
 				String[] tokens = columns[i].split(":");
-				put.addColumn(Bytes.toBytes(tokens[0]), Bytes.toBytes(tokens[1]),
-						record.get(i) == null ? null : Bytes.toBytes(record.get(i).toString()));
+				//null时不写入hbase
+				if(this.nullFormat.equals("null")) ;
+				
+				//none写入空
+				else if (this.nullFormat.equals("none")){
+					put.addColumn(Bytes.toBytes(tokens[0]), Bytes.toBytes(tokens[1]),
+							record.get(i) == null ? null : Bytes.toBytes(record.get(i).toString()));
+				}
+				//其他情况，写入指定时
+				else {
+					put.addColumn(Bytes.toBytes(tokens[0]), Bytes.toBytes(tokens[1]),
+							record.get(i) == null ? Bytes.toBytes(this.nullFormat) : Bytes.toBytes(record.get(i).toString()));
+				}
 			}
 		}
 

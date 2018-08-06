@@ -33,12 +33,15 @@ public class HBaseReader extends Reader {
 	private byte[] endRowkey;
 	private String[] columns;
 	private int rowkeyIndex = -1;
+	private String nullFormat ;
 	private static final String ROWKEY = ":rowkey";
 
 	@Override
 	public void prepare(JobContext context, PluginConfig readerConfig) {
 		startRowkey = (byte[]) readerConfig.get(HBaseReaderProperties.START_ROWKWY);
 		endRowkey = (byte[]) readerConfig.get(HBaseReaderProperties.END_ROWKWY);
+		
+		this.nullFormat =readerConfig.getString(HBaseReaderProperties.NULL_FORMAT);
 
 		Preconditions.checkNotNull(readerConfig.getString(HBaseReaderProperties.SCHEMA),
 				"HBase reader required property: schema");
@@ -100,7 +103,11 @@ public class HBaseReader extends Reader {
 						record.add(Bytes.toString(result.getRow()));
 					} else {
 						String[] column = columns[i].split(":");
-						record.add(Bytes.toString(result.getValue(Bytes.toBytes(column[0]), Bytes.toBytes(column[1]))));
+						String a = Bytes.toString(result.getValue(Bytes.toBytes(column[0]), Bytes.toBytes(column[1])));
+						//若有空值的处理
+						if(this.nullFormat !=null && this.nullFormat.equals(a))
+							record.add(null);
+						else record.add(a);
 					}
 				}
 				recordCollector.send(record);
