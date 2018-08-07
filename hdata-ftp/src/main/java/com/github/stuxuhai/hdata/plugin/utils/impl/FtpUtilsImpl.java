@@ -105,39 +105,54 @@ public class FtpUtilsImpl implements FtpUtils {
 	}
 
 	@Override
-	public boolean isFileExists(String fullname) {
+	public boolean isFileExists(String fullname,int parallelism) {
 		int dot_loc=fullname.lastIndexOf("/");
 		if(dot_loc>-1){
 			String path=fullname.substring(0,  dot_loc);
 			String filename=fullname.substring(dot_loc+1, fullname.length());
-			return isFileExists(path,filename);
+			return isFileExists(path,filename, parallelism);
 		}
 		else{
-			return isFileExists("/",fullname);
+			return isFileExists("/",fullname, parallelism);
 		}
 	}
 
 	@Override
-	public boolean isFileExists(String path, String filename) {
-		String filenameRegexp=FtpWriterProperties.getFilenameRegexp(filename);
-		try {
-			for (FTPFile ftpFile : this.ftp.listFiles(path)) {
-				//System.out.println(ftpFile.getName());
-				if (ftpFile.isFile()) {
-					if (Pattern.matches(filenameRegexp, ftpFile.getName())) {
-//						System.out.println("################## isFileExists" );
-//						System.out.println("filenameRegexp:"+filenameRegexp );
-//						System.out.println("Filename:"+path+"/"+filename );
-						return true;
-					}
-				}  
+	public boolean isFileExists(String path, String filename,int parallelism) {
+		String filenameRegexp=filename;
+		if(parallelism>1) {
+			filenameRegexp=FtpWriterProperties.getFilenameRegexp(filename);
+			try {
+				for (FTPFile ftpFile : this.ftp.listFiles(path)) {
+					if (ftpFile.isFile()) {
+						if (Pattern.matches(filenameRegexp, ftpFile.getName())) {
+							return true;
+						}
+					}  
+				}
 			}
-		} catch (IOException e) {
-			LOGGER.error(ExceptionProperties.HDATA_FTP_2004 );
-			throw new HDataException(e);
+			catch (IOException e) {
+				LOGGER.error(ExceptionProperties.HDATA_FTP_2004 );
+				throw new HDataException(e);
+			}
+			return false;
 		}
-		
-		return false;
+		else {
+			try {
+				for (FTPFile ftpFile : this.ftp.listFiles(path)) {
+					if (ftpFile.isFile()) {
+						if (filenameRegexp.equals(ftpFile.getName() ) ) {
+							return true;
+						}
+					}  
+				}
+			}
+			catch (IOException e) {
+				LOGGER.error(ExceptionProperties.HDATA_FTP_2004 );
+				throw new HDataException(e);
+			}
+			return false;
+		}
 	}
 
 	@Override

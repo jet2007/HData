@@ -105,39 +105,56 @@ public class SFtpUtilsImpl implements FtpUtils {
 	
 	
 	@Override
-	public boolean isFileExists(String fullname) {
+	public boolean isFileExists(String fullname,int parallelism) {
 		int dot_loc=fullname.lastIndexOf("/");
 		if(dot_loc>-1){
 			String path=fullname.substring(0,  dot_loc);
 			String filename=fullname.substring(dot_loc+1, fullname.length());
-			return isFileExists(path,filename);
+			return isFileExists(path,filename,  parallelism);
 		}
 		else{
-			return isFileExists("/",fullname);
+			return isFileExists("/",fullname,  parallelism);
 		}
 	}
 
 	@Override
-	public boolean isFileExists(String path, String filename) {
-		String filenameRegexp=FtpWriterProperties.getFilenameRegexp(filename);
-		try {
-			@SuppressWarnings("rawtypes")
-			Vector allFiles = this.sftp.ls(path);
-
-			for (int i = 0; i < allFiles.size(); i++){
-				LsEntry ftpFile = (LsEntry) allFiles.get(i);
-				String strName = ftpFile.getFilename();
-				
-				if( !ftpFile.getAttrs().isDir() && Pattern.matches(filenameRegexp, strName ) ){
-					//System.out.println(path+"/"+strName);
-					return  true;
+	public boolean isFileExists(String path, String filename,int parallelism) {
+		String filenameRegexp=filename;
+		if(parallelism==1){
+			try {
+				@SuppressWarnings("rawtypes")
+				Vector allFiles = this.sftp.ls(path);
+				for (int i = 0; i < allFiles.size(); i++){
+					LsEntry ftpFile = (LsEntry) allFiles.get(i);
+					String strName = ftpFile.getFilename();
+					if( !ftpFile.getAttrs().isDir() && filenameRegexp.equals(strName) ){
+						return  true;
+					}
 				}
+			} catch (SftpException e) {
+				LOGGER.error(ExceptionProperties.HDATA_FTP_1004 );
+				throw new HDataException(e);
 			}
-		} catch (SftpException e) {
-			LOGGER.error(ExceptionProperties.HDATA_FTP_1004 );
-			throw new HDataException(e);
+			return false;
 		}
-		return false;
+		else {
+			filenameRegexp=FtpWriterProperties.getFilenameRegexp(filename);
+			try {
+				@SuppressWarnings("rawtypes")
+				Vector allFiles = this.sftp.ls(path);
+				for (int i = 0; i < allFiles.size(); i++){
+					LsEntry ftpFile = (LsEntry) allFiles.get(i);
+					String strName = ftpFile.getFilename();
+					if( !ftpFile.getAttrs().isDir() && Pattern.matches(filenameRegexp, strName ) ){
+						return  true;
+					}
+				}
+			} catch (SftpException e) {
+				LOGGER.error(ExceptionProperties.HDATA_FTP_1004 );
+				throw new HDataException(e);
+			}
+			return false;
+		}
 	}
 
 	@Override

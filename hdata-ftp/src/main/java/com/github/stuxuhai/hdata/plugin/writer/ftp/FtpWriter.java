@@ -179,16 +179,15 @@ public class FtpWriter extends Writer {
 	 * 初始化，只执行1次
 	 */
 	public void init(){
-		boolean exists = ftp.isFileExists(path);
-		if(writemode.toLowerCase().equals("nonconflict")){
-			if(exists){
+		if(writemode.toLowerCase().equals("insert")){
+			if(ftp.isFileExists(path,this.parallelism)){
 				LOGGER.error(ExceptionProperties.HDATA_FTP_1102);
 				throw new HDataException(ExceptionProperties.HDATA_FTP_1102);
 			}
 		}
 		//写入模式=清除，删除目标文件
 		else if (writemode.equals("truncate")){
-			if(exists){
+			if(ftp.isFileExists(path,2)){
 				ftp.deleteFiles(path);
 			}
 		}	

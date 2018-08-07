@@ -18,8 +18,7 @@ public class FtpWriterProperties {
 //	FtpWriter写入前数据清理处理模式：示例，当path=/upload/cust.txt时
 //			truncate，写入前清理upload目录下cust.txt或cust_NNNN.txt的所有文件。
 //			overwrite，以覆盖方式写入前清理upload目录下目标cust.txt或cust_NNNN.txt的文件。
-//			insert，写入前不做任何处理,FtpWriter直接使用cust.tx写入,若两次运行，则生成2份数据；。
-//			nonConflict，如果upload目录下有cust.txt或cust_NNNN.txt的文件，直接报错。默认值
+//			insert，写入前不做任何处理,如果upload目录下有cust.txt或cust_NNNN.txt（并发>1时）的文件，直接报错。默认值
 	public static final String NULL_FORMAT = "null.format";//NULL
 	
 	//删除文件匹配的正则    cust.txt与cust_0001.txt

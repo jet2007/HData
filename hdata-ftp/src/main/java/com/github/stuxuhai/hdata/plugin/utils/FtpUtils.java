@@ -33,8 +33,8 @@ public interface FtpUtils {
 	 * @param fullname
 	 * @return
 	 */
-	public  boolean isFileExists(String fullname);
-	public  boolean isFileExists(String path, String filename);
+	public  boolean isFileExists(String fullname,int parallelism);
+	public  boolean isFileExists(String path, String filename,int parallelism);
 	
 	/**
 	 * 删除目标文件
