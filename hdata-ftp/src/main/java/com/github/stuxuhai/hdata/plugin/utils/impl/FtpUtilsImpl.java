@@ -70,7 +70,7 @@ public class FtpUtilsImpl implements FtpUtils {
 	@Override
 	public List<String> listFile(String path, String filenameRegexp, boolean recursive) {
 		List<String> files = new ArrayList<String>();
-		//System.out.println("##############------- start :["+ files.size() +"]");
+		System.out.println("##############------- start :["+ files.size() +"]");
 		try {
 			for (FTPFile ftpFile : this.ftp.listFiles(path)) {
 				
