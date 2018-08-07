@@ -1,6 +1,7 @@
 package com.github.stuxuhai.hdata.plugin.reader.ftp;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -51,6 +52,11 @@ public class FtpSplitter extends Splitter {
 			}
 			
 			List<String> files = ftp.listFile(dir, filenameRegexp, recursive);
+			for (String string : files) {
+				System.out.println("############split:"+string);
+			}
+			
+			
 			if (files.size() > 0) {
 				if (parallelism == 1) {
 					readerConfig.put(FtpReaderProperties.FILES, files);
