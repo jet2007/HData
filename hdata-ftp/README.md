@@ -56,7 +56,7 @@ fields.count.filter|否|符合的字段数，不符合则过滤记录,默认值0
 compress|否|文本压缩类型，默认不填写意味着没有压缩。支持压缩类型为zip、gzip、bzip2|
 start.row|否|数据起始行数，默认：1|
 parallelism|否|parallelism为读/写并行度，一般根据文件的个数，默认：1|
-null.format|否|将ftp文件中的指定值视为null值，默认值：\\N|
+null.format|否|将ftp文件中的指定值视为null值，默认值：\\\\N|
 
 
 
@@ -79,7 +79,7 @@ fields.separator|否|字段分隔符，默认：\t|
 line.separator|否|行分隔符，默认\n|
 compress|否|文本压缩类型，默认不填写意味着没有压缩。支持压缩类型为gzip、bzip2，不支持zip。，默认：无|
 writemode|否|ftp文件写入方式（示例，当path=/upload/cust.txt时）；1.insert(默认值)，写入前不做任何处理,如果upload目录下有cust.txt（并发=1）或cust_NNNN.txt（并发>1）的文件，则报错； 2.overwrite，以覆盖方式写入前清理upload目录下目标cust.txt或cust_NNNN.txt的文件； 3.truncate，写入前清理upload目录下cust.txt或cust_NNNN.txt的所有文件。|
-null.format|否|将null值，写入到ftp文件中的指定值，默认值：\\N|
+null.format|否|将null值，写入到ftp文件中的指定值，默认值：\\\\N|
 parallelism|否|parallelism为读/写并行度，默认值1|
  
 
