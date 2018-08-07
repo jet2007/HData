@@ -43,7 +43,7 @@ public class FtpWriter extends Writer {
 	private String compress;
 	private String protocol;
 	private String writemode;
-	private String nullvalue;
+	private String nullFormat;
 	private int parallelism;
 	//private FTPClient ftpClient;
 	private FtpUtils ftp;
@@ -80,8 +80,8 @@ public class FtpWriter extends Writer {
 		compress = writerConfig.getString(FtpWriterProperties.COMPRESS,FtpWriterProperties.ENCODING_DEFAULT);
 		protocol = writerConfig.getString(FtpWriterProperties.PROTOCOL,FtpWriterProperties.PROTOCOL_DEFAULT);
 		writemode = writerConfig.getString(FtpWriterProperties.WRITEMODE,FtpWriterProperties.WRITEMODE_DEFAULT);
-		nullvalue = StringEscapeUtils
-				.unescapeJava(writerConfig.getString(FtpWriterProperties.NULL_FORMAT, FtpWriterProperties.NULL_FORMAT_DEFAULT));
+		//nullFormat = StringEscapeUtils.unescapeJava(writerConfig.getString(FtpWriterProperties.NULL_FORMAT, FtpWriterProperties.NULL_FORMAT_DEFAULT));
+		nullFormat =  writerConfig.getString(FtpWriterProperties.NULL_FORMAT, FtpWriterProperties.NULL_FORMAT_DEFAULT);
 
  
 		//ftpClient = FTPUtils.getFtpClient(host, port, username, password);
@@ -142,7 +142,7 @@ public class FtpWriter extends Writer {
 		for (int i = 0, len = record.size(); i < len; i++) {
 			Object o = record.get(i);
 			if (o == null) {
-				strArray[i] = nullvalue;
+				strArray[i] = nullFormat;
 			} else {
 				strArray[i] = o.toString();
 			}

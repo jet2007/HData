@@ -14,23 +14,28 @@
 
 ### 3.1 配置样例
 
-- 样例1：ftp读取写入到ftp(bzip2)
+- 样例1：FTP读取-单个文件+分隔符+指定NULL字符
 
-    bin/hdata --reader ftp -Rhost="192.168.101.201" -Rport="2121" -Rusername="a" -Rpassword="a" -Rdir="/" -Rfields.separator="," -Rfilename="aaaa.txt" -Rcompress="" -Rprotocol="ftp" --writer ftp -Whost="192.168.101.201" -Wport="2121" -Wusername="a" -Wpassword="a" -Wpath="/qqqqdssq.bz2" -Wfields.separator="," -Wcompress="bzip2" -Wprotocol="ftp" 
+    /app/hdata-0.2.8/bin/hdata --reader ftp -Rhost="192.168.101.201" -Rport="2121" -Rusername="a" -Rpassword="a" -Rdir="/reader" -Rfilename="elp_demo_1a.csv" -Rprotocol="ftp" -Rfields.separator="," -Rrecursive="false" -Rnull.format="null" --writer jdbc -Wurl="jdbc:mysql://db.mysql.hotel.writer.002:3306/elp_demo?useUnicode=true&amp;characterEncoding=utf8" -Wdriver="com.mysql.jdbc.Driver" -Wusername="root" -Wpassword="123456" -Wkeyword.escaper="" -Wparallelism="1" -Wtable="elp_demo_target" -Wpresql="truncate table elp_demo.elp_demo_target;"
+	附： 指定NULL字符 null.format="null":代表源ftp文件中，若出现null字，则视为空值(默认值为\\N)
 
-- 样例2：ftp读取写入到ftp(truncate写入模式+并发=6)
+- 样例2：FTP读取-多个文件+分隔符+指定NULL字符
 
-    bin/hdata --reader ftp -Rhost="192.168.101.201" -Rport="2121" -Rusername="a" -Rpassword="a" -Rdir="/" -Rfields.separator="," -Rfilename="aaaa.txt" -Rcompress="" -Rprotocol="ftp" --writer ftp -Whost="192.168.101.201" -Wport="2121" -Wusername="a" -Wpassword="a" -Wpath="/a12.csv" -Wfields.separator="," -Wprotocol="ftp" -Wwritemode="truncate"  -Wparallelism="6"
+    /app/hdata-0.2.8/bin/hdata --reader ftp -Rhost="192.168.101.201" -Rport="2121" -Rusername="a" -Rpassword="a" -Rdir="/reader" -Rfilename="elp_demo_1[\w\d]*.csv" -Rprotocol="ftp" -Rfields.separator="," -Rrecursive="false" -Rnull.format="null" --writer jdbc -Wurl="jdbc:mysql://db.mysql.hotel.writer.002:3306/elp_demo?useUnicode=true&amp;characterEncoding=utf8" -Wdriver="com.mysql.jdbc.Driver" -Wusername="root" -Wpassword="123456" -Wkeyword.escaper="" -Wparallelism="1" -Wtable="elp_demo_target" -Wpresql="truncate table elp_demo.elp_demo_target;"
 
-- 样例3：sftp读取写入到sftp
+- 样例3：FTP读取-递归子目录
 
-    bin/hdata --reader sftp -Rhost="192.168.101.200" -Rport="2222" -Rusername="foo" -Rpassword="pass" -Rdir="/upload/aa" -Rfields.separator="," -Rfilename="test3.csv"     --writer sftp -Whost="192.168.101.200" -Wport="2222" -Wusername="foo" -Wpassword="pass"  -Wfields.separator="," -Wpath="/upload/aa/g22.txt"  
+    /app/hdata-0.2.8/bin/hdata --reader ftp -Rhost="192.168.101.201" -Rport="2121" -Rusername="a" -Rpassword="a" -Rdir="/reader" -Rfilename="elp_demo_1[\w\d]*.csv" -Rprotocol="ftp" -Rfields.separator="," -Rrecursive="true" -Rnull.format="null" --writer jdbc -Wurl="jdbc:mysql://db.mysql.hotel.writer.002:3306/elp_demo?useUnicode=true&amp;characterEncoding=utf8" -Wdriver="com.mysql.jdbc.Driver" -Wusername="root" -Wpassword="123456" -Wkeyword.escaper="" -Wparallelism="1" -Wtable="elp_demo_target" -Wpresql="truncate table elp_demo.elp_demo_target;"
+	附：预准备/reader目录的包含有子目录及文件
 
-- 样例4：sftp读取写入到sftp(gzip+并发=2)
+- 样例4：FTP读取-ZIP压缩
 
-    bin/hdata --reader sftp -Rhost="192.168.101.200" -Rport="2222" -Rusername="foo" -Rpassword="pass" -Rdir="/upload/aa" -Rfields.separator="," -Rfilename="a.csv"     --writer sftp -Whost="192.168.101.200" -Wport="2222" -Wusername="foo" -Wpassword="pass"  -Wfields.separator="," -Wpath="/upload/aa/a.gz"    -Wcompress="gzip"  -Wparallelism="2"
+    /app/hdata-0.2.8/bin/hdata --reader ftp -Rhost="192.168.101.201" -Rport="2121" -Rusername="a" -Rpassword="a" -Rdir="/reader" -Rfilename="elp_demo_1[\w\d]*.zip" -Rprotocol="ftp" -Rfields.separator="," -Rcompress="zip" -Rrecursive="true" -Rnull.format="null" --writer jdbc -Wurl="jdbc:mysql://db.mysql.hotel.writer.002:3306/elp_demo?useUnicode=true&amp;characterEncoding=utf8" -Wdriver="com.mysql.jdbc.Driver" -Wusername="root" -Wpassword="123456" -Wkeyword.escaper="" -Wparallelism="1" -Wtable="elp_demo_target"
 
 
+- 样例4：FTP读取-ZIP压缩
+
+	/app/hdata-0.2.8/bin/hdata --reader jdbc -Rurl="jdbc:mysql://db.mysql.hotel.reader.001:3306/elp_demo?useUnicode=true&amp;characterEncoding=utf8" -Rdriver="com.mysql.jdbc.Driver" -Rusername="root" -Rpassword="123456" -Rkeyword.escaper="" -Rparallelism="1" -Rtable="elp_demo_10w" --writer ftp -Whost="192.168.101.201" -Wport="2121" -Wusername="a" -Wpassword="a" -Wpath="/writer/elp_demo_target.txt" -Wparallelism="1" -Wprotocol="ftp"
 
 ### 3.2 FtpReader参数
 
