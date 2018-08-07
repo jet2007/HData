@@ -47,7 +47,7 @@ recursive|否|是否查找dir参数的目录下的所有子目录，满足filena
 encoding|否|文件编码，默认：UTF-8|
 fields.separator|否|字段分隔符，默认：\t|
 schema|否|输出的字段定义；示例"id,name,product,val,remark"|
-fields.count.filter|否|符合的字段数，不符合则过滤记录|
+fields.count.filter|否|符合的字段数，不符合则过滤记录,默认值0|
 compress|否|文本压缩类型，默认不填写意味着没有压缩。支持压缩类型为zip、gzip、bzip2|
 start.row|否|数据起始行数，默认：1|
 parallelism|否|parallelism为读/写并行度，一般根据文件的个数，默认：1|
