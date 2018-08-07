@@ -97,7 +97,7 @@ public class FtpUtilsImpl implements FtpUtils {
 		}
 		
 		for (String string : files) {
-			System.out.println("##############:["+ string +"]");
+			System.out.println("############## listFile:["+ string +"]");
 		}
 		
 		

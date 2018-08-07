@@ -50,7 +50,7 @@ public class FtpSplitter extends Splitter {
 				ftp=new SFtpUtilsImpl();
 				ftp.login(host, username, password, port);	
 			}
-			
+			System.out.println("############split:"+dir+"|"+filenameRegexp+"|"+recursive);
 			List<String> files = ftp.listFile(dir, filenameRegexp, recursive);
 			for (String string : files) {
 				System.out.println("############split:"+string);
