@@ -99,6 +99,8 @@ public class FtpSplitter extends Splitter {
 		ftp.login("192.168.101.201", "a", "a", 2121);
 		List<String> files = ftp.listFile("/reader", "([\\w\\d\\-_])*.csv", true);
 		System.out.println("############split:"+files.size());
+		System.out.println("############split:"+files.size());
+		System.out.println("############split:"+files.size());
 		for (String string : files) {
 			System.out.println("############split:"+string);
 		}

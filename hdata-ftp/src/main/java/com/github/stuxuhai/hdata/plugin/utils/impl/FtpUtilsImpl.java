@@ -88,7 +88,7 @@ public class FtpUtilsImpl implements FtpUtils {
 							&& !ftpFile.getName().equals(".")
 							&& !ftpFile.getName().equals("..")
 						) {
-					listFile(path + "/" + ftpFile.getName(), filenameRegexp, recursive);
+					files.addAll(listFile(path + "/" + ftpFile.getName(), filenameRegexp, recursive));
 				}
 			}
 		} catch (IOException e) {		

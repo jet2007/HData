@@ -91,7 +91,7 @@ public class SFtpUtilsImpl implements FtpUtils {
 	        	}
 	        	// 递归目录
 	        	else if(recursive && ftpFile.getAttrs().isDir() && (!strName.equals("."))&& (!strName.equals("..")) ){
-	        		listFile( path + "/" + strName , filenameRegexp, recursive);
+	        		files.addAll(listFile( path + "/" + strName , filenameRegexp, recursive));
 	        		}
 	        	}
 		} catch (SftpException e) {
