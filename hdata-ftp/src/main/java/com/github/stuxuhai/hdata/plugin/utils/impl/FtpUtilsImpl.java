@@ -95,7 +95,7 @@ public class FtpUtilsImpl implements FtpUtils {
 			LOGGER.error(ExceptionProperties.HDATA_FTP_2003 );
 			throw new HDataException(e);
 		}
-		
+		System.out.println("############## listFile");
 		for (String string : files) {
 			System.out.println("############## listFile:["+ string +"]");
 		}
