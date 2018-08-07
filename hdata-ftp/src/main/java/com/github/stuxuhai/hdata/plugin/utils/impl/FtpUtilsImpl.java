@@ -46,7 +46,7 @@ public class FtpUtilsImpl implements FtpUtils {
 			// login失败
             if (!FTPReply.isPositiveCompletion(reply)) {
             	this.ftp.disconnect();
-    			LOGGER.error(ExceptionProperties.HDATA_FTP_2001 );
+    			//LOGGER.error(ExceptionProperties.HDATA_FTP_2001 );
     			throw new HDataException(ExceptionProperties.HDATA_FTP_2001);
             }
 		} catch (IOException e) {
@@ -219,7 +219,8 @@ public class FtpUtilsImpl implements FtpUtils {
 	
 //	public static void main(String[] args) {
 //		FtpUtilsImpl ftp=new FtpUtilsImpl();
-//		ftp.login("192.168.101.201", "a", "cc", 2121);
+//		ftp.login("192.168.101.201", "a", "a", 2121);
 //		System.out.println(ftp.ftp.isAvailable());
+//		//System.out.println(ftp.ftp.get());
 //	}
 }

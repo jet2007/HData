@@ -61,7 +61,7 @@ public class FtpReader extends Reader {
 		startRow = readerConfig.getInt(FtpReaderProperties.START_ROW, FtpReaderProperties.START_ROW_DEFAULT);
 		compress = readerConfig.getString(FtpReaderProperties.COMPRESS,FtpReaderProperties.COMPRESS_DEFAULT);
 		protocol = readerConfig.getString(FtpReaderProperties.PROTOCOL, FtpReaderProperties.PROTOCOL_DEFAULT);
-		username = readerConfig.getString(FtpReaderProperties.NULL_FORMAT, FtpReaderProperties.NULL_FORMAT_DEFAULT);
+		nullFormat = readerConfig.getString(FtpReaderProperties.NULL_FORMAT, FtpReaderProperties.NULL_FORMAT_DEFAULT);
 
 		if (readerConfig.containsKey(FtpReaderProperties.SCHEMA)) {
 			fields = new Fields();
@@ -84,7 +84,7 @@ public class FtpReader extends Reader {
 				ftp=new SFtpUtilsImpl();
 				ftp.login(host, username, password, port);	
 			}
-			
+			//System.out.println("################1008");
 			
 			for (String file : files) {
 				InputStream is = ftp.getFileStream(file);
@@ -104,10 +104,14 @@ public class FtpReader extends Reader {
 				else {
 					br = new BufferedReader(new InputStreamReader(is, encoding));
 				}
-
+				
+				//System.out.println("################1010"+"["+file+"]");
+				
 				String line = null;
 				long currentRow = 0;
 				while ((line = br.readLine()) != null) {
+					
+					//System.out.println("################line"+"["+line+"]");
 					currentRow++;
 					if (currentRow >= startRow) {
 						String[] tokens = StringUtils.splitPreserveAllTokens(line, fieldsSeparator);
@@ -123,6 +127,7 @@ public class FtpReader extends Reader {
 						}
 					}
 				}
+				//System.out.println("################1011");
 				if(protocol.equals("ftp")){
 					ftp.completePendingCommand();
 				}
