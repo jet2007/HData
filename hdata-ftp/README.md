@@ -34,192 +34,50 @@
 
 ### 3.2 FtpReader参数
 
-* **protocol**
-
-	* 描述：ftp服务器协议，目前支持传输协议有ftp和sftp。
-	* 必选：否
-	* 默认值：ftp
-
-* **host**
-
-	* 描述：ftp服务器地址。示例：192.168.1.100
-	* 必选：是 
-	* 默认值：无 
-
-* **port**
-	* 描述：ftp服务器端口。示例：21
-	* 必选：否
-	* 默认值：21 
-
-* **username**
-
-	* 描述：ftp服务器访问用户名。示例：user_etl
-	* 必选：是 
-	* 默认值：无 
-
-* **password**
-
-	* 描述：ftp服务器访问密码。 示例：pass_etl
-	* 必选：是 
-	* 默认值：无 
-
-* **dir**
-
-	* 描述：远程FTP文件系统的目录路径信息，不含文件信息；示例"/","/upload"。
-	* 必选：是
-	* 默认值：无
-
-* **filename**
-
-	* 描述：dir参数下的文件；支持正则表达式；示例："cust_([0-9]*).dat","cust_20180102.zip"等
-	* 必选：是 
-	* 默认值：无
-
-* **recursive**
-
-    * 描述：是否查找dir参数的目录下的所有子目录，满足filename文件；示例：false,true
-    * 必选：否
-    * 默认值：false
-
-* **fields.separator**
-
-	* 描述：读取的字段分隔符
-	* 必选：否
-	* 默认值：\t
-
-* **compress**
-
-	* 描述：文本压缩类型，默认不填写意味着没有压缩。支持压缩类型为zip、gzip、bzip2
-	* 必选：否 
-	* 默认值：没有压缩
-
-* **encoding**
-
-	* 描述：读取文件的编码配置。
- 	* 必选：否
- 	* 默认值：utf-8
-
-* **start.row**
-
-	* 描述：数据起始行数，默认：1
- 	* 必选：否
- 	* 默认值：1
-
-* **schema**
-
-	* 描述：输出的字段定义；示例"id,name,product,val,remark"
- 	* 必选：否 
- 	* 默认值：无
-
-* **parallelism**
-
-    * 描述：parallelism为读/写并行度，所有插件均有该参数；切分依据为文件数量；如若在性能速度无大要求，建议设置为1；
-    * 必选：否 
-    * 默认值：1
-
-* **null.format**
-
-    * 描述：空值写入ftp文件的填充值。
-    * 必选：否
-    * 默认值：\N
-
-### 3.2 FtpWriter参数
-
-* **protocol**
-
-    * 描述：ftp服务器协议，目前支持传输协议有ftp和sftp。
-    * 必选：否
-    * 默认值：ftp
-
-* **host**
-
-    * 描述：ftp服务器地址。示例：192.168.1.100
-    * 必选：是 
-    * 默认值：无 
-
-* **port**
-    * 描述：ftp服务器端口。示例：21
-    * 必选：否
-    * 默认值：21 
-
-* **username**
-
-    * 描述：ftp服务器访问用户名。示例：user_etl
-    * 必选：是 
-    * 默认值：无 
-
-* **password**
-
-    * 描述：ftp服务器访问密码。 示例：pass_etl
-    * 必选：是 
-    * 默认值：无 
-
-* **path**
-
-    * 描述：FTP文件系统的文件路径信息，FtpWriter会写入Path单个/多个文件,必须包含有后缀名。示例：/upload/cust.txt
-        * 当parallelism=1时，会生成/upload/cust.txt
-        * 当parallelism=N(N>=2)时，会生成/upload/cust_0000.txt,/upload/cust_0001.txt,...,/upload/cust_000N.txt等N个文件；
-    * 必选：是
-    * 默认值：无
- 
-* **fields.separator**
-
-    * 描述：读取的字段分隔符
-    * 必选：否
-    * 默认值：\t
-
-* **encoding**
-
-    * 描述：读取文件的编码配置。
-    * 必选：否
-    * 默认值：utf-8
-
-* **line.separator**
-
-    * 描述：行分隔符
-    * 必选：否
-    * 默认值：\n
-
-* **compress**
-
-    * 描述：文本压缩类型，默认不填写意味着没有压缩。支持压缩类型为gzip、bzip2，不支持zip。
-    * 必选：否 
-    * 默认值：没有压缩
-
-* **writemode**
- 
-    * 描述：FtpWriter写入前数据清理处理模式：示例，当path=/upload/cust.txt时
-        * truncate，写入前清理upload目录下cust.txt或cust_NNNN.txt的所有文件。
-        * append，写入前不做任何处理,FtpWriter直接使用cust.tx写入,若两次运行，则生成2份数据；慎用。
-        * nonConflict，如果upload目录下有cust.txt或cust_NNNN.txt的文件，直接报错。
-    * 必选：否
-    * 默认值：nonConflict
+参数        | 是否必选   | 描述                    |
+-----------| ----- | ---------------------------------------- |
+protocol|否|ftp服务器协议，目前支持传输协议有ftp和sftp; 默认值：ftp|
+host|是|FTP连接地址，如：192.168.1.1|
+port|否|FTP端口，默认：21|
+username|是|用户名|
+password|是|密码|
+dir|是|远程FTP文件系统的目录路径信息，不含文件信息；示例"/","/upload"。|
+filename|是|dir参数下的文件；支持正则表达式；示例："cust_([0-9]*).txt","cust_20180102.zip"等|
+recursive|否|是否查找dir参数的目录下的所有子目录，满足filename文件；值false,true，默认：false|
+encoding|否|文件编码，默认：UTF-8|
+fields.separator|否|字段分隔符，默认：\t|
+schema|否|输出的字段定义；示例"id,name,product,val,remark"|
+fields.count.filter|否|符合的字段数，不符合则过滤记录|
+compress|否|文本压缩类型，默认不填写意味着没有压缩。支持压缩类型为zip、gzip、bzip2|
+start.row|否|数据起始行数，默认：1|
+parallelism|否|parallelism为读/写并行度，一般根据文件的个数，默认：1|
+null.format|否|将ftp文件中的指定值视为null值，默认值：\\N|
 
 
-* **compress**
 
-    * 描述：文本压缩类型，默认不填写意味着没有压缩。支持压缩类型为gzip、bzip2
-    * 必选：否 
-    * 默认值：无压缩 
-    
-* **encoding**
 
-    * 描述：读取文件的编码配置。
-    * 必选：否 
-    * 默认值：utf-8 <br />
+### 3.3 FtpWriter参数
+
+
+* ftp
+
+参数        | 是否必选   | 描述                    |
+-----------| ----- | ---------------------------------------- |
+protocol|否|ftp服务器协议，目前支持传输协议有ftp和sftp; 默认值：ftp|
+host|是|FTP连接地址，如：192.168.1.1|
+port|否|FTP端口，默认：21|
+username|是|用户名|
+password|是|密码|
+path|是|描述：FTP文件系统的文件路径信息，FtpWriter会写入Path单个/多个文件,必须包含有后缀名。示例：/upload/cust.txt; 1.当parallelism=1时，会生成/upload/cust.txt; 2.当parallelism=N(N>=2)时，会生成/upload/cust_0000.txt,/upload/cust_0001.txt,...,/upload/cust_000N.txt等N个文件；|
+encoding|否|文件编码，默认：UTF-8|
+fields.separator|否|字段分隔符，默认：\t|
+line.separator|否|行分隔符，默认\n|
+compress|否|文本压缩类型，默认不填写意味着没有压缩。支持压缩类型为gzip、bzip2，不支持zip。，默认：无|
+writemode|否|ftp文件写入方式（示例，当path=/upload/cust.txt时）；1.insert(默认值)，写入前不做任何处理,如果upload目录下有cust.txt（并发=1）或cust_NNNN.txt（并发>1）的文件，则报错； 2.overwrite，以覆盖方式写入前清理upload目录下目标cust.txt或cust_NNNN.txt的文件； 3.truncate，写入前清理upload目录下cust.txt或cust_NNNN.txt的所有文件。|
+null.format|否|将null值，写入到ftp文件中的指定值，默认值：\\N|
+parallelism|否|parallelism为读/写并行度，默认值1|
  
 
-* **null.format**
-
-    * 描述：空值写入ftp文件的填充值。
-    * 必选：否
-    * 默认值：\N
-
-* **parallelism**
-
-    * 描述：parallelism为读/写并行度，所有插件均有该参数；切分依据为文件数量；如若在性能速度无大要求，建议设置为1；
-    * 必选：否 
-    * 默认值：1
 
 
 ## 4 FAQ

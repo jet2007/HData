@@ -70,7 +70,6 @@ public class FtpUtilsImpl implements FtpUtils {
 	@Override
 	public List<String> listFile(String path, String filenameRegexp, boolean recursive) {
 		List<String> files = new ArrayList<String>();
-		System.out.println("##############------- start :["+ files.size() +"]");
 		try {
 			for (FTPFile ftpFile : this.ftp.listFiles(path)) {
 				
@@ -95,11 +94,6 @@ public class FtpUtilsImpl implements FtpUtils {
 			LOGGER.error(ExceptionProperties.HDATA_FTP_2003 );
 			throw new HDataException(e);
 		}
-		
-		for (String string : files) {
-			LOGGER.info("满足条件的file:"+"["+string+"]");
-		}
-		
 		return files;
 	}
 

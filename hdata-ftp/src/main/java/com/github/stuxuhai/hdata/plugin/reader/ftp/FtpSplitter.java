@@ -25,7 +25,6 @@ public class FtpSplitter extends Splitter {
 		PluginConfig readerConfig = jobConfig.getReaderConfig();
 		String host = readerConfig.getString(FtpReaderProperties.HOST);
 		Preconditions.checkNotNull(host, "FTP reader required property: host");
-		//List<String> fs = (List<String>) readerConfig.get(FtpReaderProperties.FILES);
 
 		int port = readerConfig.getInt(FtpReaderProperties.PORT, FtpReaderProperties.PORT_DEFAULT);
 		String username = readerConfig.getString(FtpReaderProperties.USERNAME, FtpReaderProperties.USERNAME_DEFAULT);
@@ -53,15 +52,11 @@ public class FtpSplitter extends Splitter {
 			
 			
 			
-//			System.out.println("############split:"+dir+"|"+filenameRegexp+"|"+recursive);
 			List<String> files = ftp.listFile(dir, filenameRegexp, recursive);
-			//files.addAll(fs);
 			
-			System.out.println("############ [[[[[split]]]]]:"+files.size());
 			for (String string : files) {
-				System.out.println("############split:"+string);
+				System.out.println("满足条件的文件有:["+string+"]");
 			}
-			System.out.println("############ [[[[[split]]]]]:"+files.size());
 			
 			
 			if (files.size() > 0) {
