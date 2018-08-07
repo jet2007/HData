@@ -87,7 +87,7 @@ public class FtpReader extends Reader {
 			
 			for (String file : files) {
 				InputStream is = ftp.getFileStream(file);
-				LOGGER.info("开始读取file");
+				LOGGER.info("开始读取file:"+"["+file+"]");
 				BufferedReader br = null;
 				if (compress.equals("gzip")) {
 					GZIPInputStream gzin = new GZIPInputStream(is);

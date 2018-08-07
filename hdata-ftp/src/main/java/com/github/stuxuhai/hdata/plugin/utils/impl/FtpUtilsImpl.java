@@ -96,10 +96,9 @@ public class FtpUtilsImpl implements FtpUtils {
 			throw new HDataException(e);
 		}
 		
-//		for (String string : files) {
-//			System.out.println("##############------- listFile:["+ string +"]");
-//		}
-//		System.out.println("##############------- end:["+ files.size() +"]");
+		for (String string : files) {
+			LOGGER.info("满足条件的file:"+"["+string+"]");
+		}
 		
 		return files;
 	}
