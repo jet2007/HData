@@ -84,11 +84,10 @@ public class FtpReader extends Reader {
 				ftp=new SFtpUtilsImpl();
 				ftp.login(host, username, password, port);	
 			}
-			//System.out.println("################1008");
 			
 			for (String file : files) {
 				InputStream is = ftp.getFileStream(file);
-				System.out.println("############### execute:"+"["+file+"]");
+				LOGGER.info("开始读取file");
 				BufferedReader br = null;
 				if (compress.equals("gzip")) {
 					GZIPInputStream gzin = new GZIPInputStream(is);
@@ -106,13 +105,11 @@ public class FtpReader extends Reader {
 					br = new BufferedReader(new InputStreamReader(is, encoding));
 				}
 				
-				//System.out.println("################1010"+"["+file+"]");
 				
 				String line = null;
 				long currentRow = 0;
 				while ((line = br.readLine()) != null) {
 					
-					//System.out.println("################line"+"["+line+"]");
 					currentRow++;
 					if (currentRow >= startRow) {
 						String[] tokens = StringUtils.splitPreserveAllTokens(line, fieldsSeparator);
@@ -128,7 +125,6 @@ public class FtpReader extends Reader {
 						}
 					}
 				}
-				//System.out.println("################1011");
 				if(protocol.equals("ftp")){
 					ftp.completePendingCommand();
 				}

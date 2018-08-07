@@ -70,7 +70,7 @@ public class FtpUtilsImpl implements FtpUtils {
 	@Override
 	public List<String> listFile(String path, String filenameRegexp, boolean recursive) {
 		List<String> files = new ArrayList<String>();
-		
+		//System.out.println("##############------- start :["+ files.size() +"]");
 		try {
 			for (FTPFile ftpFile : this.ftp.listFiles(path)) {
 				
@@ -95,11 +95,11 @@ public class FtpUtilsImpl implements FtpUtils {
 			LOGGER.error(ExceptionProperties.HDATA_FTP_2003 );
 			throw new HDataException(e);
 		}
-		System.out.println("############## listFile");
-		for (String string : files) {
-			System.out.println("############## listFile:["+ string +"]");
-		}
 		
+//		for (String string : files) {
+//			System.out.println("##############------- listFile:["+ string +"]");
+//		}
+//		System.out.println("##############------- end:["+ files.size() +"]");
 		
 		return files;
 	}
