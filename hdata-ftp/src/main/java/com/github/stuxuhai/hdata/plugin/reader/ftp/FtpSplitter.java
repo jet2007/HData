@@ -54,6 +54,9 @@ public class FtpSplitter extends Splitter {
 			
 			System.out.println("############split:"+dir+"|"+filenameRegexp+"|"+recursive);
 			List<String> files = ftp.listFile(dir, filenameRegexp, recursive);
+			
+			System.out.println("############split:"+files.size());
+			
 			for (String string : files) {
 				System.out.println("############split:"+string);
 			}
