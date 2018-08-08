@@ -37,6 +37,26 @@
 
 	/app/hdata-0.2.8/bin/hdata --reader jdbc -Rurl="jdbc:mysql://db.mysql.hotel.reader.001:3306/elp_demo?useUnicode=true&amp;characterEncoding=utf8" -Rdriver="com.mysql.jdbc.Driver" -Rusername="root" -Rpassword="123456" -Rkeyword.escaper="" -Rparallelism="1" -Rtable="elp_demo_10w" --writer ftp -Whost="192.168.101.201" -Wport="2121" -Wusername="a" -Wpassword="a" -Wpath="/writer/elp_demo_target.txt" -Wparallelism="1" -Wprotocol="ftp"
 
+
+- 样例5：FTP写入-txt文件+分隔符+指定NULL字符
+
+	/app/hdata-0.2.8/bin/hdata --reader jdbc -Rurl="jdbc:mysql://db.mysql.hotel.reader.001:3306/elp_demo?useUnicode=true&amp;characterEncoding=utf8" -Rdriver="com.mysql.jdbc.Driver" -Rusername="root" -Rpassword="123456" -Rkeyword.escaper="" -Rparallelism="1" -Rtable="elp_demo_10w" --writer ftp -Whost="192.168.101.201" -Wport="2121" -Wusername="a" -Wpassword="a" -Wpath="/writer/elp_demo_target.gz" -Wparallelism="1" -Wprotocol="ftp" -Wwritemode="overwrite" -Wfields.separator="\t" -Wcompress="gzip" 
+	
+- 样例6：FTP写入-gzip压缩+overwrite写入模式
+
+	/app/hdata-0.2.8/bin/hdata --reader jdbc -Rurl="jdbc:mysql://db.mysql.hotel.reader.001:3306/elp_demo?useUnicode=true&amp;characterEncoding=utf8" -Rdriver="com.mysql.jdbc.Driver" -Rusername="root" -Rpassword="123456" -Rkeyword.escaper="" -Rparallelism="1" -Rtable="elp_demo_10w" --writer ftp -Whost="192.168.101.201" -Wport="2121" -Wusername="a" -Wpassword="a" -Wpath="/writer/elp_demo_target.gz" -Wparallelism="1" -Wprotocol="ftp" -Wwritemode="overwrite" -Wfields.separator="\t" -Wcompress="gzip"
+	
+- 样例7：FTP写入-gzip压缩+truncate写入模式+并发数3
+	
+	/app/hdata-0.2.8/bin/hdata --reader jdbc -Rurl="jdbc:mysql://db.mysql.hotel.reader.001:3306/elp_demo?useUnicode=true&amp;characterEncoding=utf8" -Rdriver="com.mysql.jdbc.Driver" -Rusername="root" -Rpassword="123456" -Rkeyword.escaper="" -Rparallelism="1" -Rtable="elp_demo_10w" --writer ftp -Whost="192.168.101.201" -Wport="2121" -Wusername="a" -Wpassword="a" -Wpath="/writer/elp_demo_target.gz" -Wparallelism="3" -Wprotocol="ftp" -Wwritemode="truncate" -Wfields.separator="\t" -Wcompress="gzip"	
+	- 生成elp_demo_target_0000(0001,0003).gzip 3个文件
+	
+ 
+
+
+
+
+
 ### 3.2 FtpReader参数
 
 参数        | 是否必选   | 描述                    |
