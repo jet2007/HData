@@ -27,7 +27,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 
-
 public class FtpWriter extends Writer {
 	
 	private static final Logger LOGGER = LogManager.getLogger(FtpWriter.class);
@@ -49,7 +48,6 @@ public class FtpWriter extends Writer {
 	//private FTPClient ftpClient;
 	private FtpUtils ftp;
 	private BufferedWriter bw;
-	private OutputStream outputStream;
 	private String[] strArray;
 	
 
@@ -118,7 +116,8 @@ public class FtpWriter extends Writer {
 		try {
 
 			//写入模式
-			this.outputStream = ftp.getoutputStream(path,writemode);
+			OutputStream outputStream = ftp.getoutputStream(path,writemode);
+			
 			
 			if (compress.equals("gzip")) {
 				bw = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(outputStream), encoding));
@@ -162,7 +161,7 @@ public class FtpWriter extends Writer {
 	public void close() {
 		if (bw != null) {
 			try {
-				this.outputStream.close();
+				bw.flush();
 				bw.close();
 			} catch (IOException e) {
 				LOGGER.error(Throwables.getStackTraceAsString(e));
