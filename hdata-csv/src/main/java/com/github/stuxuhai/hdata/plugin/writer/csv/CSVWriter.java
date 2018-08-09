@@ -16,11 +16,12 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
 
 import com.github.stuxuhai.hdata.plugin.FormatConf;
-
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.github.stuxuhai.hdata.api.Fields;
 import com.github.stuxuhai.hdata.api.JobContext;
@@ -32,6 +33,7 @@ import com.google.common.base.Preconditions;
 
 public class CSVWriter extends Writer {
 
+	private static final Logger LOGGER = LogManager.getLogger(CSVWriter.class);
     private String path = null;
     private String encoding = null;
     private String fieldSeparator = null;
@@ -107,7 +109,9 @@ public class CSVWriter extends Writer {
         	FileOutputStream outputStream=null;
         	if(this.writemode.toLowerCase().equals("insert")){
         		File file =new File(path);
-        		if(file.exists()) throw new HDataException("写入方式为insert,但文件已存在！！！");
+        		if(file.exists()) {
+        			LOGGER.error("写入方式为insert,但文件已存在！！！" );
+        			throw new HDataException();}
         		else outputStream = new FileOutputStream(path);
         			
         	}
@@ -131,7 +135,8 @@ public class CSVWriter extends Writer {
 				writer = new BufferedWriter(new OutputStreamWriter(outputStream, encoding));
 			}
 			else {
-        		throw new HDataException("压缩格式值错误！！！");
+				LOGGER.error("压缩格式值错误！！！" );
+        		throw new HDataException();
         	}
         } catch (Exception e) {
             throw new HDataException(e);
@@ -199,6 +204,7 @@ public class CSVWriter extends Writer {
     public void close() {
         if (csvPrinter != null) {
             try {
+            	//csvPrinter.flush();
                 csvPrinter.close();
             } catch (IOException e) {
                 throw new HDataException(e);
@@ -207,7 +213,7 @@ public class CSVWriter extends Writer {
 
         if (writer != null) {
             try {
-            	writer.flush();
+            	//writer.flush();
                 writer.close();
             } catch (IOException e) {
                 throw new HDataException(e);
