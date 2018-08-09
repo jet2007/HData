@@ -75,9 +75,6 @@ public class CSVWriter extends Writer {
         format = writerConfig.getString(CSVWriterProperties.FORMAT);
         FormatConf.confCsvFormat(format,csvFormat);
         
-        
-        System.out.println("#########["+fieldSeparator+"]");
-
         fields = context.getFields();
         showColumns = writerConfig.getBoolean(CSVWriterProperties.SHOW_COLUMNS, CSVWriterProperties.SHOW_COLUMNS_DEFAULT);
         showTypesAndComments = writerConfig.getBoolean(CSVWriterProperties.SHOW_TYPES_AND_COMMENTS, CSVWriterProperties.SHOW_TYPES_AND_COMMENTS_DEFAULT);
@@ -121,7 +118,8 @@ public class CSVWriter extends Writer {
         	else if (this.writemode.toLowerCase().equals("append") ) 
         		outputStream = new FileOutputStream(path,true);
         	else {
-        		throw new HDataException("写入方式值错误！！！");
+        		LOGGER.error("写入方式值错误！！！" );
+        		throw new HDataException();
         	}
         	
         	// 增加gzip/bzip2的压缩格式
@@ -218,8 +216,4 @@ public class CSVWriter extends Writer {
         }
     }
     
-//    public static void main(String[] args) {
-//		System.out.println("_".charAt(0));
-//	}
-
 }

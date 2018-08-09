@@ -94,8 +94,8 @@ public class FtpReader extends Reader {
 					br = new BufferedReader(new InputStreamReader(gzin, encoding));
 				}
 				else if (compress.equals("bzip2")) {
-					BZip2CompressorInputStream gzin = new BZip2CompressorInputStream(is);
-					br = new BufferedReader(new InputStreamReader(gzin, encoding));
+					BZip2CompressorInputStream bzin = new BZip2CompressorInputStream(is);
+					br = new BufferedReader(new InputStreamReader(bzin, encoding));
 				}
 				else if (compress.equals("zip")) {
 					ZipCycleInputStream zis = new ZipCycleInputStream(is);
