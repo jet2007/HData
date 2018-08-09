@@ -12,6 +12,7 @@ public class CSVReaderProperties {
 	public static final String NULL_FORMAT = "null.format";
 	public static final String COMPRESS = "compress";//gzip,bzip2,zip,无(默认值)
 	public static final String RECURSIVE  = "recursive";//gzip,bzip2,zip,无(默认值)
+	public static final String SCHEMA = "schema";
 	
 	
 	public static final String ENCODING_DEFAULT = "UTF-8";

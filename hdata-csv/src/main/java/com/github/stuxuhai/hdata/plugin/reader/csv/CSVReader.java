@@ -17,7 +17,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.github.stuxuhai.hdata.api.DefaultRecord;
+import com.github.stuxuhai.hdata.api.Fields;
 import com.github.stuxuhai.hdata.api.JobContext;
+import com.github.stuxuhai.hdata.api.OutputFieldsDeclarer;
 import com.github.stuxuhai.hdata.api.PluginConfig;
 import com.github.stuxuhai.hdata.api.Reader;
 import com.github.stuxuhai.hdata.api.Record;
@@ -37,6 +39,7 @@ public class CSVReader extends Reader {
 	private String nullFormat;
 	private String lineSeparator;
 	private String fieldsSeparator;
+	private Fields fields;
 
 	@Override
 	public void prepare(JobContext context, PluginConfig readerConfig) {
@@ -51,7 +54,13 @@ public class CSVReader extends Reader {
 		this.lineSeparator = readerConfig.getString(CSVReaderProperties.LINE_SEPARATOR, CSVReaderProperties.LINE_SEPARATOR_DEFAULT);
 		fieldsSeparator = StringEscapeUtils.unescapeJava(readerConfig.getString(CSVReaderProperties.FIELDS_SEPARATOR,CSVReaderProperties.FIELDS_SEPARATOR_DEFAULT));
 		
-		
+		if (readerConfig.containsKey(CSVReaderProperties.SCHEMA)) {
+			fields = new Fields();
+			String[] tokens = readerConfig.getString(CSVReaderProperties.SCHEMA).split("\\s*,\\s*");
+			for (String field : tokens) {
+				fields.add(field);
+			}
+		}
 	}
 
 	@Override
@@ -99,6 +108,11 @@ public class CSVReader extends Reader {
 		}
 	}
 
+	@Override
+	public void declareOutputFields(OutputFieldsDeclarer declarer) {
+		declarer.declare(fields);
+	}
+	
 	@Override
 	public Splitter newSplitter() {
 		return new CSVSplitter();
