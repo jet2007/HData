@@ -36,6 +36,10 @@
 - 样例4：FTP读取-ZIP压缩
 
 	/app/hdata-0.2.8/bin/hdata --reader jdbc -Rurl="jdbc:mysql://db.mysql.hotel.reader.001:3306/elp_demo?useUnicode=true&amp;characterEncoding=utf8" -Rdriver="com.mysql.jdbc.Driver" -Rusername="root" -Rpassword="123456" -Rkeyword.escaper="" -Rparallelism="1" -Rtable="elp_demo_10w" --writer ftp -Whost="192.168.101.201" -Wport="2121" -Wusername="a" -Wpassword="a" -Wpath="/writer/elp_demo_target.txt" -Wparallelism="1" -Wprotocol="ftp"
+	
+- 样例4.2：FTP读取-选取指定列与固定值+定义列名
+
+	/app/hdata-0.2.8/bin/hdata --reader ftp -Rhost="192.168.101.201" -Rport="2121" -Rusername="a" -Rpassword="a" -Rdir="/reader" -Rfilename="elp_demo_1a.csv" -Rprotocol="ftp" -Rfields.separator="," -Rrecursive="false" -Rnull.format="null" -Rcolumns="1,2,3,#abc,#1" -Rschema="a1,a2,a3,a4,a5" --writer csv -Wpath="/tmp/hdata/b/22223.csv" -Wshow.columns="true"
 
 
 - 样例5：FTP写入-txt文件+分隔符+指定NULL字符

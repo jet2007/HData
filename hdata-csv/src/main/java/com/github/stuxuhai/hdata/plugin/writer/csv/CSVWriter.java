@@ -103,6 +103,7 @@ public class CSVWriter extends Writer {
         try {
         	
         	//写入方式
+        	LOGGER.info("######写入文件["+path+"]" );
         	FileOutputStream outputStream=null;
         	if(this.writemode.toLowerCase().equals("insert")){
         		File file =new File(path);
