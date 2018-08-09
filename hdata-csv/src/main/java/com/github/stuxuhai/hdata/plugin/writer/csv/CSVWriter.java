@@ -131,13 +131,9 @@ public class CSVWriter extends Writer {
 			else if (compress.equals("bzip2")) {
 				writer = new BufferedWriter(new OutputStreamWriter(new BZip2CompressorOutputStream(outputStream), encoding));
 			}
-			else if (compress.equals("")) {
+			else  {
 				writer = new BufferedWriter(new OutputStreamWriter(outputStream, encoding));
-			}
-			else {
-				LOGGER.error("压缩格式值错误！！！" );
-        		throw new HDataException();
-        	}
+			} 
         } catch (Exception e) {
             throw new HDataException(e);
         }
