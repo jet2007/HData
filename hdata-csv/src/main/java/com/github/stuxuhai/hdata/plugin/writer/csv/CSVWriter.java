@@ -1,5 +1,7 @@
 package com.github.stuxuhai.hdata.plugin.writer.csv;
 
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -11,8 +13,11 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPOutputStream;
 
 import com.github.stuxuhai.hdata.plugin.FormatConf;
+
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -29,7 +34,7 @@ public class CSVWriter extends Writer {
 
     private String path = null;
     private String encoding = null;
-    private String separator = null;
+    private String fieldSeparator = null;
     private java.io.Writer writer;
     private CSVPrinter csvPrinter;
     private Fields fields;
@@ -44,21 +49,36 @@ public class CSVWriter extends Writer {
     private static final Pattern REG_FILE_EXTENSION = Pattern.compile("(\\.\\w+)$");
     private String format;
     private CSVFormat csvFormat = CSVFormat.DEFAULT;
+    
+    
+    private String lineSeparator;
+    private String nullFormat;
+    private String compress;
+    private String writemode;
 
     @Override
     public void prepare(JobContext context, PluginConfig writerConfig) {
         path = writerConfig.getString(CSVWriterProperties.PATH);
         Preconditions.checkNotNull(path, "CSV writer required property: path");
 
-        encoding = writerConfig.getString(CSVWriterProperties.ENCODING, "UTF-8");
-        separator = StringEscapeUtils.unescapeJava(writerConfig.getString(CSVWriterProperties.SEPARATOR, ","));
+        encoding = writerConfig.getString(CSVWriterProperties.ENCODING, CSVWriterProperties.ENCODING_DEFAULT);
+        fieldSeparator = StringEscapeUtils.unescapeJava(writerConfig.getString(CSVWriterProperties.FIELD_SEPARATOR,  CSVWriterProperties.FIELDS_SEPARATOR_DEFAULT));
+        this.lineSeparator = StringEscapeUtils.unescapeJava(writerConfig.getString(CSVWriterProperties.LINE_SEPARATOR,  CSVWriterProperties.LINE_SEPARATOR_DEFAULT));
 
+        this.nullFormat = writerConfig.getString(CSVWriterProperties.NULL_FORMAT, CSVWriterProperties.NULL_FORMAT_DEFAULT);
+        this.compress = writerConfig.getString(CSVWriterProperties.COMPRESS, CSVWriterProperties.COMPRESS_DEFAULT);
+        this.writemode = writerConfig.getString(CSVWriterProperties.WRITEMODE, CSVWriterProperties.WRITEMODE_DEFAULT);
+        
+        
         format = writerConfig.getString(CSVWriterProperties.FORMAT);
         FormatConf.confCsvFormat(format,csvFormat);
+        
+        //修正列分隔和行分隔符
+        csvFormat.withDelimiter(fieldSeparator.charAt(0)).withRecordSeparator(this.lineSeparator);
 
         fields = context.getFields();
-        showColumns = writerConfig.getBoolean(CSVWriterProperties.SHOW_COLUMNS, false);
-        showTypesAndComments = writerConfig.getBoolean(CSVWriterProperties.SHOW_TYPES_AND_COMMENTS, false);
+        showColumns = writerConfig.getBoolean(CSVWriterProperties.SHOW_COLUMNS, CSVWriterProperties.SHOW_COLUMNS_DEFAULT);
+        showTypesAndComments = writerConfig.getBoolean(CSVWriterProperties.SHOW_TYPES_AND_COMMENTS, CSVWriterProperties.SHOW_TYPES_AND_COMMENTS_DEFAULT);
         if (showTypesAndComments) {
             types = context.getJobConfig().getString("types").split("\001");
             comments = context.getJobConfig().getString("comments").split("\001");
@@ -80,18 +100,56 @@ public class CSVWriter extends Writer {
             path = String.format("%s_%04d%s", filePathWithoutExtension, sequence.getAndIncrement(), fileExtension);
         }
 
+        
         try {
-            writer = new OutputStreamWriter(new FileOutputStream(path), encoding);
+        	
+        	//写入方式
+        	FileOutputStream outputStream=null;
+        	if(this.writemode.toLowerCase().equals("insert")){
+        		File file =new File(path);
+        		if(file.exists()) throw new HDataException("写入方式为insert,但文件已存在！！！");
+        		else outputStream = new FileOutputStream(path);
+        			
+        	}
+        	else if (this.writemode.toLowerCase().equals("overwrite") ){
+        		 outputStream = new FileOutputStream(path);
+        	}
+        	else if (this.writemode.toLowerCase().equals("append") ) 
+        		outputStream = new FileOutputStream(path,true);
+        	else {
+        		throw new HDataException("写入方式值错误！！！");
+        	}
+        	
+        	// 增加gzip/bzip2的压缩格式
+			if (compress.equals("gzip")) {
+				writer = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(outputStream), encoding));
+			}
+			else if (compress.equals("bzip2")) {
+				writer = new BufferedWriter(new OutputStreamWriter(new BZip2CompressorOutputStream(outputStream), encoding));
+			}
+			else if (compress.equals("")) {
+				writer = new BufferedWriter(new OutputStreamWriter(outputStream, encoding));
+			}
+			else {
+        		throw new HDataException("压缩格式值错误！！！");
+        	}
         } catch (Exception e) {
             throw new HDataException(e);
         }
+        
+//        try {
+//            writer = new OutputStreamWriter(new FileOutputStream(path), encoding);
+//            
+//        } catch (Exception e) {
+//            throw new HDataException(e);
+//        }
     }
 
     @Override
     public void execute(Record record) {
         if (csvPrinter == null) {
             try {
-                csvPrinter = new CSVPrinter(writer, csvFormat.withDelimiter(separator.charAt(0)));
+                csvPrinter = new CSVPrinter(writer, csvFormat);
                 if (showTypesAndComments) {
                     for (String type : types) {
                         csvList.add(type);
@@ -122,8 +180,10 @@ public class CSVWriter extends Writer {
             Object obj = record.get(i);
             if (obj instanceof Timestamp) {
                 csvList.add(dateFormat.format(obj));
-            } else {
+            } else if (obj !=null){
                 csvList.add(obj);
+            } else {
+            	csvList.add(this.nullFormat); //null值的写入文件的指定值
             }
         }
 
@@ -147,6 +207,7 @@ public class CSVWriter extends Writer {
 
         if (writer != null) {
             try {
+            	writer.flush();
                 writer.close();
             } catch (IOException e) {
                 throw new HDataException(e);
