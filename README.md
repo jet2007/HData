@@ -129,44 +129,18 @@ field.wrap.replace.string|否|若字符串字段中存在换行符时需要替�
 number.format|否|小数类型字段的输出格式|
 keyword.escaper|否|关键字转义字符，默认为\`|
 
-* hive
+* hive(见子目录)
 
-参数        | 是否必选   | 描述                    |
------------| ----- | ---------------------------------------- |
-metastore.uris|否|Hive Metastore连接地址，如：thrift://localhost:9083, 默认: HiveConf.getVar(ConfVars.METASTOREURIS) 即 `hive-site.xml` 中的 `hive.metastore.uris` |
-database|否|数据库名，默认：default|
-table|是|表名|
-partitions|否|分区，例如: visit_date='2016-07-07'|
-hadoop.user|否|具有HDFS读权限的用户名|
-hdfs.conf.path|否|hdfs-site.xml配置文件路径|
-select.columns|否|选择读取的字段|
-convert.null|否|设置值为NULL时对应的字符串，默认："NULL"|
+ 
 
 
-* hdfs
+* hdfs(见子目录)
 
-参数        | 是否必选   | 描述                    |
------------| ----- | ---------------------------------------- |
-dir|是|HDFS目录路径，如：hdfs://192.168.1.1:8020/user/dir1|
-filename|是|文件名，支持正则表达式|
-schema|否|输出的字段定义|
-fields.separator|否|字段分隔符，默认：\0001|
-encoding|否|文件编码，默认：UTF-8|
-hadoop.user|否|具有HDFS读权限的用户名|
-hdfs.conf.path|否|hdfs-site.xml配置文件路径|
+ 
 
-* hbase
+* hbase(见子目录)
 
-参数        | 是否必选   | 描述                    |
------------| ----- | ---------------------------------------- |
-zookeeper.quorum|是|Zookeeper连接地址，如：192.168.1.16,192.168.1.17|
-zookeeper.client.port|否|Zookeeper客户端端口，默认：2181|
-table|是|表名|
-start.rowkey|否|Rowkey起始值|
-end.rowkey|否|Rowkey结束值|
-columns|是|读取的列，如：:rowkey,cf:start_ip,cf:end_ip|
-schema|是|输出的字段定义，如：id,start_ip,end_ip|
-zookeeper.znode.parent|否|hbase使用的Zookeeper根节点|
+ 
 	
 
 * http
@@ -194,21 +168,7 @@ schema|否|输出的字段定义，如：id,start_ip,end_ip|
 
 其他配置请参考：[Kafka Configuration](https://kafka.apache.org/documentation/#configuration)
 
-* ftp
-
-参数        | 是否必选   | 描述                    |
------------| ----- | ---------------------------------------- |
-host|是|FTP连接地址，如：192.168.1.1|
-port|否|FTP端口，默认：21|
-username|是|用户名|
-password|是|密码|
-dir|是|FTP目录，如：/input/dir|
-filename|是|文件名，支持正则表达式|
-recursive|否|是否递归搜索文件，默认：false|
-encoding|否|文件编码，默认：UTF-8|
-fields.separator|否|字段分隔符，默认：\t|
-schema|否|输出的字段定义|
-fields.count.filter|否|符合的字段数，不符合则过滤记录|
+* ftp(见子目录)
 
 * mongodb
 
@@ -248,43 +208,20 @@ batch.insert.size|否|批量插入的记录数，默认值：10000|
 schema|否|字段名配置，一般用于writer和reader的字段名不一致时|
 keyword.escaper|否|关键字转义字符，默认为\`|
 upsert.columns|否|指定 Upsert 的字段列表，逗号分隔，目前仅支持 Mysql，默认为空(即不启用 upsert)|
+presql|否|presql|
+postsql|否|postsql|
 
-* hive
+* hive(见子目录)
 
-参数        | 是否必选   | 描述                    |
------------| ----- | ---------------------------------------- |
-metastore.uris|否|Hive Metastore连接地址，如：thrift://localhost:9083, 默认: HiveConf.getVar(ConfVars.METASTOREURIS) 即 `hive-site.xml` 中的 `hive.metastore.uris` |
-database|否|数据库名，默认：default|
-table|是|表名|
-partitions|否|分区条件，如：day='20140418'|
-hadoop.user|否|具有HDFS写权限的用户名|
-hdfs.conf.path|否|hdfs-site.xml配置文件路径|
+ 
 
-* hdfs
+* hdfs(见子目录)
 
-参数        | 是否必选   | 描述                    |
------------| ----- | ---------------------------------------- |
-path|是|HDFS文件路径，如：hdfs://192.168.1.1:8020/user/1.txt|
-fields.separator|否|字段分隔符，默认：\t|
-line.separator|否|行分隔符，默认：\n|
-encoding|否|文件编码，默认：UTF-8|
-compress.codec|否|压缩编码，如：org.apache.hadoop.io.compress.GzipCodec|
-hadoop.user|否|具有HDFS写权限的用户名|
-max.file.size.mb|否|单个文件最大大小限制（单位：MB）|
-partition.date.index|否|日期字段索引值，起始值为0|
-partition.date.format|否|日期格式，如：yyyy-MM-dd|
-hdfs.conf.path|否|hdfs-site.xml配置文件路径|
+ 
 
-* hbase
+* hbase(见子目录)
 
-参数        | 是否必选   | 描述                    |
------------| ----- | ---------------------------------------- |
-zookeeper.quorum|是|Zookeeper连接地址，如：192.168.1.16,192.168.1.17|
-zookeeper.client.port|否|Zookeeper客户端端口，默认：2181|
-table|是|表名|
-columns|是|列名，如：:rowkey,cf:start_ip|
-batch.insert.size|否|批量插入的记录数，默认值：10000|
-zookeeper.znode.parent|否|hbase使用的Zookeeper根节点|
+ 
 
 * kafka
 
@@ -295,19 +232,9 @@ fields.separator|否|字段分隔符，默认\t|
 
 其他配置请参考：[Kafka Configuration](https://kafka.apache.org/documentation/#configuration)
 
-* ftp
+* ftp(见子目录)
 
-参数        | 是否必选   | 描述                    |
------------| ----- | ---------------------------------------- |
-host|是|FTP连接地址，如：192.168.1.1|
-port|否|FTP端口，默认：21|
-username|是|用户名|
-password|是|密码|
-path|是|FTP保存目录|
-encoding|否|文件编码，默认：UTF-8|
-fields.separator|否|字段分隔符，默认：\t|
-line.separator|否|行分隔符，默认\n|
-gzip.compress|否|是否启用gzip压缩，默认：false|
+ 
 
 * mongodb
 

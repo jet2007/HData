@@ -64,7 +64,7 @@ public class CSVWriter extends Writer {
         Preconditions.checkNotNull(path, "CSV writer required property: path");
 
         encoding = writerConfig.getString(CSVWriterProperties.ENCODING, CSVWriterProperties.ENCODING_DEFAULT);
-        fieldSeparator = StringEscapeUtils.unescapeJava(writerConfig.getString(CSVWriterProperties.FIELD_SEPARATOR,  CSVWriterProperties.FIELDS_SEPARATOR_DEFAULT));
+        fieldSeparator = StringEscapeUtils.unescapeJava(writerConfig.getString(CSVWriterProperties.FIELDS_SEPARATOR,  CSVWriterProperties.FIELDS_SEPARATOR_DEFAULT));
         this.lineSeparator = StringEscapeUtils.unescapeJava(writerConfig.getString(CSVWriterProperties.LINE_SEPARATOR,  CSVWriterProperties.LINE_SEPARATOR_DEFAULT));
 
         this.nullFormat = writerConfig.getString(CSVWriterProperties.NULL_FORMAT, CSVWriterProperties.NULL_FORMAT_DEFAULT);
@@ -75,8 +75,8 @@ public class CSVWriter extends Writer {
         format = writerConfig.getString(CSVWriterProperties.FORMAT);
         FormatConf.confCsvFormat(format,csvFormat);
         
-        //修正列分隔和行分隔符
-        csvFormat.withDelimiter(fieldSeparator.charAt(0)).withRecordSeparator(this.lineSeparator);
+        
+        System.out.println("#########["+fieldSeparator+"]");
 
         fields = context.getFields();
         showColumns = writerConfig.getBoolean(CSVWriterProperties.SHOW_COLUMNS, CSVWriterProperties.SHOW_COLUMNS_DEFAULT);
@@ -150,7 +150,8 @@ public class CSVWriter extends Writer {
     public void execute(Record record) {
         if (csvPrinter == null) {
             try {
-                csvPrinter = new CSVPrinter(writer, csvFormat);
+            	//修正列分隔和行分隔符
+                csvPrinter = new CSVPrinter(writer, csvFormat.withDelimiter(fieldSeparator.charAt(0)).withRecordSeparator(this.lineSeparator));
                 if (showTypesAndComments) {
                     for (String type : types) {
                         csvList.add(type);
@@ -216,5 +217,9 @@ public class CSVWriter extends Writer {
             }
         }
     }
+    
+//    public static void main(String[] args) {
+//		System.out.println("_".charAt(0));
+//	}
 
 }

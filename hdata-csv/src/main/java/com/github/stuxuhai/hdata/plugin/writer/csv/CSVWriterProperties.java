@@ -3,7 +3,7 @@ package com.github.stuxuhai.hdata.plugin.writer.csv;
 public class CSVWriterProperties {
     public static final String PATH = "path";
     public static final String ENCODING = "encoding";
-    public static final String FIELD_SEPARATOR = "fields.separator";
+    public static final String FIELDS_SEPARATOR = "fields.separator";
     public static final String SHOW_COLUMNS = "show.columns";
     public static final String SHOW_TYPES_AND_COMMENTS = "show.types.and.comments";
 	public static final String LINE_SEPARATOR = "line.separator"; // \n,\r\n,\r (linux,windows,unix)
