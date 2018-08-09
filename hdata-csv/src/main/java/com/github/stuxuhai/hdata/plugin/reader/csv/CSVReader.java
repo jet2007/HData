@@ -40,6 +40,7 @@ public class CSVReader extends Reader {
 	private String lineSeparator;
 	private String fieldsSeparator;
 	private Fields fields;
+	private String columns;
 
 	@Override
 	public void prepare(JobContext context, PluginConfig readerConfig) {
@@ -53,6 +54,7 @@ public class CSVReader extends Reader {
 		this.nullFormat = readerConfig.getString(CSVReaderProperties.NULL_FORMAT, CSVReaderProperties.NULL_FORMAT_DEFAULT);
 		this.lineSeparator = readerConfig.getString(CSVReaderProperties.LINE_SEPARATOR, CSVReaderProperties.LINE_SEPARATOR_DEFAULT);
 		fieldsSeparator = StringEscapeUtils.unescapeJava(readerConfig.getString(CSVReaderProperties.FIELDS_SEPARATOR,CSVReaderProperties.FIELDS_SEPARATOR_DEFAULT));
+		columns = readerConfig.getString(CSVReaderProperties.COLUMNS);
 		
 		if (readerConfig.containsKey(CSVReaderProperties.SCHEMA)) {
 			fields = new Fields();
@@ -89,12 +91,13 @@ public class CSVReader extends Reader {
 			
 			Iterable<CSVRecord> records = csvFormat.withDelimiter(this.fieldsSeparator.charAt(0)).withRecordSeparator(this.lineSeparator).parse(in);
 			for (CSVRecord csvRecord : records) {
+				String[] tokens = getRecordByColumns(csvRecord);
 				currentRow++;
 				if (currentRow >= startRow) {
-					Record hdataRecord = new DefaultRecord(csvRecord.size());
-					for (int i = 0, len = csvRecord.size(); i < len; i++) {
-						if(!this.nullFormat.equals(csvRecord.get(i)))
-							hdataRecord.add(csvRecord.get(i));
+					Record hdataRecord = new DefaultRecord(tokens.length);
+					for (int i = 0, len = tokens.length; i < len; i++) {
+						if(!this.nullFormat.equals(tokens[i]))
+							hdataRecord.add(tokens[i]);
 						else
 							hdataRecord.add(null);
 					}
@@ -107,7 +110,39 @@ public class CSVReader extends Reader {
 			throw new HDataException(e);
 		}
 	}
+	
+	
+	/*
+	 * 根据原输入与this.columns，返回选取的字段后的输入
+	 */
 
+	public String[]  getRecordByColumns(CSVRecord csvRecord) {
+		if(this.columns == null || this.columns.isEmpty()){
+			String[] rec=new String[csvRecord.size()];
+			for (int i = 0; i < csvRecord.size(); i++) {
+				rec[i]=csvRecord.get(i);
+			}
+			return rec;
+		}
+			
+		else {
+			String[] arr = this.columns.split("\\s*,\\s*");
+			String[] rec=new String[arr.length];
+			for (int i = 0; i < arr.length; i++) {
+				if(!arr[i].startsWith("#"))
+					try {
+						rec[i]=csvRecord.get(Integer.parseInt(arr[i])-1);
+					} catch (Exception e) {
+						throw new HDataException(e);
+					}	
+				else {
+					rec[i]=arr[i].substring(1);
+				}
+			}
+			return rec;
+		}
+	}
+	
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declare(fields);

@@ -88,7 +88,7 @@ line.separator|否|行分隔符，默认：\\N|
 encoding|否|文件编码，默认：UTF-8|
 null.format|否|将ftp文件中的指定值视为null值，默认值：\\\\N|
 compress|否|文本压缩类型，默认不填写意味着没有压缩。支持压缩类型为gzip、bzip2，不支持zip。，默认：无|
-writemode|否|ftp文件写入方式（示例，当path=/upload/cust.txt时）；1.insert(默认值)，写入前不做任何处理,如果upload目录下有cust.txt（并发=1）或cust_NNNN.txt（并发>1）的文件，则报错； 2.overwrite，以覆盖方式写入前清理upload目录下目标cust.txt或cust_NNNN.txt的文件； 3.append，追加写入cust.txt或cust_NNNN.txt。|
+writemode|否|文件写入方式（示例，当path=/upload/cust.txt时）；1.insert(默认值)，写入前不做任何处理,如果upload目录下有cust.txt（并发=1）或cust_NNNN.txt（并发>1）的文件，则报错； 2.overwrite，以覆盖方式写入前清理upload目录下目标cust.txt或cust_NNNN.txt的文件； 3.append，追加写入cust.txt或cust_NNNN.txt。|
 format|否|解析csv的csvFormat的格式，不建议修改。无(默认值),excel,mysql,tdf,rfc4180|
 show.columns|否|打出字段名|
 show.types.and.comments|否|不建议|

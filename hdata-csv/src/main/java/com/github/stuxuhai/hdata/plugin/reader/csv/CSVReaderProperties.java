@@ -13,7 +13,9 @@ public class CSVReaderProperties {
 	public static final String COMPRESS = "compress";//gzip,bzip2,zip,无(默认值)
 	public static final String RECURSIVE  = "recursive";//gzip,bzip2,zip,无(默认值)
 	public static final String SCHEMA = "schema";
-	
+    //包含的字段，多个字段用逗号分隔，[第1列从数字1开始;固定值前加#号]; 
+    //例如1,3,5,#2018,#abc  代表共取5列值，依次值为第1,3,5列的值和固定值2018,abc
+    public static final String COLUMNS = "columns";
 	
 	public static final String ENCODING_DEFAULT = "UTF-8";
 	public static final String FIELDS_SEPARATOR_DEFAULT = ",";
