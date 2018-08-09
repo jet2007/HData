@@ -43,6 +43,7 @@ public class FtpReader extends Reader {
 	private String compress;
 	private String protocol;
 	private String nullFormat;
+	private String columns;
 	
 	private List<String> files = new ArrayList<String>();
 
@@ -62,7 +63,8 @@ public class FtpReader extends Reader {
 		compress = readerConfig.getString(FtpReaderProperties.COMPRESS,FtpReaderProperties.COMPRESS_DEFAULT);
 		protocol = readerConfig.getString(FtpReaderProperties.PROTOCOL, FtpReaderProperties.PROTOCOL_DEFAULT);
 		nullFormat = readerConfig.getString(FtpReaderProperties.NULL_FORMAT, FtpReaderProperties.NULL_FORMAT_DEFAULT);
-
+		columns = readerConfig.getString(FtpReaderProperties.COLUMNS);
+		
 		if (readerConfig.containsKey(FtpReaderProperties.SCHEMA)) {
 			fields = new Fields();
 			String[] tokens = readerConfig.getString(FtpReaderProperties.SCHEMA).split("\\s*,\\s*");
@@ -112,7 +114,8 @@ public class FtpReader extends Reader {
 					
 					currentRow++;
 					if (currentRow >= startRow) {
-						String[] tokens = StringUtils.splitPreserveAllTokens(line, fieldsSeparator);
+						String[] tokensOld = StringUtils.splitPreserveAllTokens(line, fieldsSeparator);
+						String[] tokens=getRecordByColumns(tokensOld);
 						if (tokens.length >= fieldsCount) {
 							Record record = new DefaultRecord(tokens.length);
 							for (String field : tokens) {
@@ -137,6 +140,31 @@ public class FtpReader extends Reader {
 		} finally {
 			//FTPUtils.closeFtpClient(ftpClient);
 			ftp.close();
+		}
+	}
+	
+	
+	/*
+	 * 根据原输入与this.columns，返回选取的字段后的输入
+	 */
+	public String[]  getRecordByColumns(String[] tokens) {
+		if(this.columns == null || this.columns.isEmpty())
+			return tokens;
+		else {
+			String[] arr = this.columns.split("\\s*,\\s*");
+			String[] rec=new String[arr.length];
+			for (int i = 0; i < arr.length; i++) {
+				if(arr[i].startsWith("#"))
+					rec[i]=arr[i].substring(1);
+				else {
+					try {
+						rec[i]=tokens[Integer.parseInt(arr[i])-1];
+					} catch (Exception e) {
+						throw new HDataException(e);
+					}		
+				}
+			}
+			return rec;
 		}
 	}
 

@@ -17,6 +17,7 @@ public class FtpReaderProperties {
 	public static final String COMPRESS = "compress"; //gzip,zip,bzip2,""
 	public static final String PROTOCOL = "protocol"; //ftp,sftp
 	public static final String NULL_FORMAT = "null.format"; //ftp,sftp
+	public static final String COLUMNS = "columns";
 	
 	
 	public static final String USERNAME_DEFAULT = "anonymous";

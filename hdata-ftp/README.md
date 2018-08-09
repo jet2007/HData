@@ -75,6 +75,7 @@ schema|否|输出的字段定义；示例"id,name,product,val,remark"|
 fields.count.filter|否|符合的字段数，不符合则过滤记录,默认值0|
 compress|否|文本压缩类型，默认不填写意味着没有压缩。支持压缩类型为zip、gzip、bzip2|
 start.row|否|数据起始行数，默认：1|
+columns|否|包含的字段，不填视为全部字段；多个字段用逗号分隔，第1列从数字1开始;固定值前加#号;【例如1,3,5,#2018,#abc  代表共取5列值，依次值为第1,3,5列的值和固定值2018,abc】|
 parallelism|否|parallelism为读/写并行度，一般根据文件的个数，默认：1|
 null.format|否|将ftp文件中的指定值视为null值，默认值：\\\\N|
 

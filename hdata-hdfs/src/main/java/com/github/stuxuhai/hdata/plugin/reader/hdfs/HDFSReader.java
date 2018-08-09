@@ -109,7 +109,7 @@ public class HDFSReader extends Reader {
 		if(this.columns == null || this.columns.isEmpty())
 			return tokens;
 		else {
-			String[] arr = this.columns.split(",");
+			String[] arr = this.columns.split("\\s*,\\s*");
 			String[] rec=new String[arr.length];
 			for (int i = 0; i < arr.length; i++) {
 				if(arr[i].startsWith("#"))
