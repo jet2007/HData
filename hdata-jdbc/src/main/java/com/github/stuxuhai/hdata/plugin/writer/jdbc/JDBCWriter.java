@@ -193,11 +193,11 @@ public class JDBCWriter extends Writer {
 		}
     	Object[] objsRecord = EtlTimeAndFieldsHasher.getRecordByEtlTimeAndFieldsHasher(etlTime, fieldsHasher, objs);
     	
-    	System.out.print("######## objsRecord=[");
-    	for (int i = 0; i < objsRecord.length; i++) {
-			System.out.print(objsRecord[i]+",");
-		}
-    	System.out.println("]");
+//    	System.out.print("######## objsRecord=[");
+//    	for (int i = 0; i < objsRecord.length; i++) {
+//			System.out.print(objsRecord[i]+",");
+//		}
+//    	System.out.println("]");
     	
         try {
         	
