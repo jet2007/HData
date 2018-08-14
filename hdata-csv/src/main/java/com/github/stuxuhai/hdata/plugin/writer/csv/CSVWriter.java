@@ -16,6 +16,8 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
 
 import com.github.stuxuhai.hdata.plugin.FormatConf;
+import com.github.stuxuhai.hdata.utils.EtlTimeAndFieldsHasher;
+
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -52,11 +54,16 @@ public class CSVWriter extends Writer {
     private String format;
     private CSVFormat csvFormat = CSVFormat.DEFAULT;
     
+    public static final String ETL_TIME = "etl.time"; //etl_time:1
+    public static final String FIELDS_HASHER = "fields.hasher";//fields_hasher:2
+    
     
     private String lineSeparator;
     private String nullFormat;
     private String compress;
     private String writemode;
+    private String etlTime ;
+    private String fieldsHasher ;
 
     @Override
     public void prepare(JobContext context, PluginConfig writerConfig) {
@@ -71,11 +78,15 @@ public class CSVWriter extends Writer {
         this.compress = writerConfig.getString(CSVWriterProperties.COMPRESS, CSVWriterProperties.COMPRESS_DEFAULT);
         this.writemode = writerConfig.getString(CSVWriterProperties.WRITEMODE, CSVWriterProperties.WRITEMODE_DEFAULT);
         
+        this.etlTime = writerConfig.getString(CSVWriterProperties.ETL_TIME);
+        this.fieldsHasher = writerConfig.getString(CSVWriterProperties.FIELDS_HASHER);
         
         format = writerConfig.getString(CSVWriterProperties.FORMAT);
         FormatConf.confCsvFormat(format,csvFormat);
         
-        fields = context.getFields();
+        //fields = context.getFields();
+        fields = EtlTimeAndFieldsHasher.getColomnsByEtlTimeAndFieldsHasher(etlTime, fieldsHasher, context.getFields());
+        
         showColumns = writerConfig.getBoolean(CSVWriterProperties.SHOW_COLUMNS, CSVWriterProperties.SHOW_COLUMNS_DEFAULT);
         showTypesAndComments = writerConfig.getBoolean(CSVWriterProperties.SHOW_TYPES_AND_COMMENTS, CSVWriterProperties.SHOW_TYPES_AND_COMMENTS_DEFAULT);
         if (showTypesAndComments) {
@@ -99,9 +110,7 @@ public class CSVWriter extends Writer {
             path = String.format("%s_%04d%s", filePathWithoutExtension, sequence.getAndIncrement(), fileExtension);
         }
 
-        
         try {
-        	
         	//写入方式
         	LOGGER.info("######写入文件["+path+"]" );
         	FileOutputStream outputStream=null;
@@ -136,13 +145,6 @@ public class CSVWriter extends Writer {
         } catch (Exception e) {
             throw new HDataException(e);
         }
-        
-//        try {
-//            writer = new OutputStreamWriter(new FileOutputStream(path), encoding);
-//            
-//        } catch (Exception e) {
-//            throw new HDataException(e);
-//        }
     }
 
     @Override
@@ -177,8 +179,9 @@ public class CSVWriter extends Writer {
             }
         }
 
-        for (int i = 0, len = record.size(); i < len; i++) {
-            Object obj = record.get(i);
+        Object[] objsRecord = EtlTimeAndFieldsHasher.getRecordByEtlTimeAndFieldsHasher(etlTime, fieldsHasher, record);
+        for (int i = 0, len = objsRecord.length; i < len; i++) {
+            Object obj = objsRecord[i];
             if (obj instanceof Timestamp) {
                 csvList.add(dateFormat.format(obj));
             } else if (obj !=null){
@@ -206,7 +209,6 @@ public class CSVWriter extends Writer {
                 throw new HDataException(e);
             }
         }
-
         if (writer != null) {
             try {
             	//writer.flush();

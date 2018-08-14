@@ -85,6 +85,8 @@ partition.date.index|否|日期字段索引值，起始值为0|
 partition.date.format|否|日期格式，如：yyyy-MM-dd|
 hdfs.conf.path|否|hdfs-site.xml配置文件路径|
 null.format|否|提供nullFormat定义哪些字符串可以表示为null,如果用户配置: 默认值=\\N，那么如果源头数据是"\N"，视作null字段|
+etl.time|否|含义为增加一列值为系统当前时间；格式为"字段名称:字段位置"；其中字段位置有2种格式（设reader有id,name,val三个字段）；第1种"+N",视为最后一列后添加新列，即是id,name,val,etl_time(N+1); 第2种"N",视为在第N列之前添加 新列，即id,etl_time,name,val(N=2)；  1、默认值为空，视为无此列；2、当设为""时，等价于"etl_time:+1"；3、当设值为"etl"时，等价于"etl:+1";|4、示例"etl:2","etl:+2"
+fields.hasher|否|含义为增加一列值为reader的行记录的hash值；格式为"字段名称:字段位置"；其中字段位置有2种格式（设reader有id,name,val三个字段）；第1种"+N",视为最后一列后添加新列，即是id,name,val,fields_hasher(N+1); 第2种"N",视为在第N列之前添加 新列，即id,fields_hasher,name,val(N=2)； 1、默认值为空，视为无此列；2、当设为""时，等价于"fields_hasher:+1"；3、当设值为"hasher"时，等价于"hasher:+1";|4、示例"hasher:2","hasher:+2"|
 
 - max.file.size.mb：参数没有变化情况下，重跑，有可能存在数据不一到情况；
 ```

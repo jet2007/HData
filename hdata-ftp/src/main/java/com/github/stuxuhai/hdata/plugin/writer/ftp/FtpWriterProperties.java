@@ -23,7 +23,8 @@ public class FtpWriterProperties {
 	
 	//删除文件匹配的正则    cust.txt与cust_0001.txt
 
-	
+    public static final String ETL_TIME = "etl.time"; //etl_time:1
+    public static final String FIELDS_HASHER = "fields.hasher";//fields_hasher:2
 	
 	public static final int PORT_DEFAULT = 21;
 	public static final String USERNAME_DEFAULT = "anonymous";

@@ -11,7 +11,8 @@ public class CSVWriterProperties {
 	public static final String COMPRESS = "compress";//gzip,bzip2,无(默认值)
 	public static final String WRITEMODE = "writemode";//insert,overwrite,append
     public static final String FORMAT = "format"; // 默认值,excel,mysql,tdf,rfc4180  不建议修改，除非需求特殊及了解csvFormat
-    
+    public static final String ETL_TIME = "etl.time"; //etl_time:1
+    public static final String FIELDS_HASHER = "fields.hasher";//fields_hasher:2
     
 	public static final String ENCODING_DEFAULT = "UTF-8";
 	public static final String FIELDS_SEPARATOR_DEFAULT = ",";

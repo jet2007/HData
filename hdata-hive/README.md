@@ -165,10 +165,12 @@ hadoop-common-2.6.0-cdh5.7.0.jar  hive-metastore-1.1.0-cdh5.7.0.jar  libfb303-0.
 metastore.uris|否|Hive Metastore连接地址，如：thrift://localhost:9083(填写域名好像报错，可使用IP), 默认: HiveConf.getVar(ConfVars.METASTOREURIS) 即 `hive-site.xml` 中的 `hive.metastore.uris` |
 database|否|数据库名，默认：default|
 table|是|表名|
-partitions|否|分区条件，如：day='20140418'|
+partitions|否|分区条件，如：day='20140418'或 day='20180102',aa='01'|
 hadoop.user|否|具有HDFS写权限的用户名|
 hdfs.conf.path|否|hdfs-site.xml配置文件路径|
 hive.settings|否|hive set语句，目前作用不明显，可无视；分号隔开、如：【set a=1;set b=true;】|
+etl.time|否|含义为增加一列值为系统当前时间；格式为"字段名称:字段位置"；其中字段位置有2种格式（设reader有id,name,val三个字段）；第1种"+N",视为最后一列后添加新列，即是id,name,val,etl_time(N+1); 第2种"N",视为在第N列之前添加 新列，即id,etl_time,name,val(N=2)；  1、默认值为空，视为无此列；2、当设为""时，等价于"etl_time:+1"；3、当设值为"etl"时，等价于"etl:+1";|4、示例"etl:2","etl:+2"
+fields.hasher|否|含义为增加一列值为reader的行记录的hash值；格式为"字段名称:字段位置"；其中字段位置有2种格式（设reader有id,name,val三个字段）；第1种"+N",视为最后一列后添加新列，即是id,name,val,fields_hasher(N+1); 第2种"N",视为在第N列之前添加 新列，即id,fields_hasher,name,val(N=2)； 1、默认值为空，视为无此列；2、当设为""时，等价于"fields_hasher:+1"；3、当设值为"hasher"时，等价于"hasher:+1";|4、示例"hasher:2","hasher:+2"|
 
 * **已修复 bug**
 

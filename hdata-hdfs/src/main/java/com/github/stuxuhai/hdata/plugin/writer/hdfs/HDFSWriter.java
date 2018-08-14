@@ -22,6 +22,7 @@ import com.github.stuxuhai.hdata.api.PluginConfig;
 import com.github.stuxuhai.hdata.api.Record;
 import com.github.stuxuhai.hdata.api.Writer;
 import com.github.stuxuhai.hdata.exception.HDataException;
+import com.github.stuxuhai.hdata.utils.EtlTimeAndFieldsHasher;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 
@@ -34,7 +35,9 @@ public class HDFSWriter extends Writer {
 	private String encoding;
 	private String compressCodec;
 	private String nullFormat;
-	
+    private String etlTime ;
+    private String fieldsHasher ;
+    
 	private BufferedWriter bw;
 	private String[] strArray;
 	private int fileNum = 0;
@@ -53,6 +56,8 @@ public class HDFSWriter extends Writer {
 	private static AtomicInteger sequence = new AtomicInteger(0);
 	private static final Pattern REG_FILE_PATH_WITHOUT_EXTENSION = Pattern.compile(".*?(?=(\\.\\w+)?$)");
 	private static final Pattern REG_FILE_EXTENSION = Pattern.compile("(\\.\\w+)$");
+	
+
 
 	private Path createFilePath(int fileNum) {
 		String path = null;
@@ -110,6 +115,9 @@ public class HDFSWriter extends Writer {
 		dateFormat = writerConfig.getString(HDFSWriterProperties.PARTITIONED_DATE_FORMAT);
 		
 		this.nullFormat=writerConfig.getString(HDFSWriterProperties.NULL_FORMAT,HDFSWriterProperties.NULL_FORMAT_DEFAULT);
+		
+        this.etlTime = writerConfig.getString(HDFSWriterProperties.ETL_TIME);
+        this.fieldsHasher = writerConfig.getString(HDFSWriterProperties.FIELDS_HASHER);
 
 		String hadoopUser = writerConfig.getString(HDFSWriterProperties.HADOOP_USER);
 		if (hadoopUser != null) {
@@ -131,13 +139,15 @@ public class HDFSWriter extends Writer {
 
 	@Override
 	public void execute(Record record) {
+		Object[] objsRecord = EtlTimeAndFieldsHasher.getRecordByEtlTimeAndFieldsHasher(etlTime, fieldsHasher, record);
+		
 		if (dateIndex >= 0 && dateFormat != null) {
 			if (sdf == null) {
 				sdf = new SimpleDateFormat(dateFormat);
 			}
 
 			try {
-				String currentDate = defaultdf.format(sdf.parse(record.get(dateIndex).toString()));
+				String currentDate = defaultdf.format(sdf.parse(objsRecord[dateIndex].toString()));
 				if (lastDate == null) {
 					lastDate = currentDate;
 				} else if (!currentDate.equals(lastDate)) {
@@ -171,11 +181,11 @@ public class HDFSWriter extends Writer {
 		}
 
 		if (strArray == null) {
-			strArray = new String[record.size()];
+			strArray = new String[objsRecord.length];
 		}
 
-		for (int i = 0, len = record.size(); i < len; i++) {
-			Object o = record.get(i);
+		for (int i = 0, len = objsRecord.length; i < len; i++) {
+			Object o = objsRecord[i];
 			if (o == null) {
 				//strArray[i] = "NULL";
 				strArray[i] = this.nullFormat; //空值处理的地方

@@ -16,7 +16,7 @@ public class JDBCWriterProperties {
     public static final String POST_SQL = "postsql";
     
     public static final String ETL_TIME = "etl.time"; //etl_time:1
-    public static final String FIELDS_HASHER = "fields.hasher";//hasher:2
+    public static final String FIELDS_HASHER = "fields.hasher";//fields_hasher:2
     
     
     

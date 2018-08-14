@@ -77,7 +77,7 @@ public class EtlTimeAndFieldsHasher {
 	
  
 	/**
-	 * 
+	 * 经过etlTime和fieldsHasher处理后的String[]
 	 * @param etlTime  etlTime的字段名称与位置
 	 * @param fieldsHasher hash的字段名称与位置
 	 * @param record String[]的输入
@@ -129,60 +129,19 @@ public class EtlTimeAndFieldsHasher {
 	}
 	
 	/**
-	 * 
+	 * 经过etlTime和fieldsHasher处理后的String[]
 	 * @param etlTime  etlTime的字段名称与位置
 	 * @param fieldsHasher hash的字段名称与位置
 	 * @param record 输入
 	 * @return 经过etlTime和fieldsHasher处理后的String[]
 	 */
-	public static Record getRecordByEtlTimeAndFieldsHasher(String etlTime,String fieldsHasher,Record record){
-		if(etlTime==null && fieldsHasher==null){
-			return record;
+	public static Object[] getRecordByEtlTimeAndFieldsHasher(String etlTime,String fieldsHasher,Record record){
+    	Object[] objs= new Object[record.size()] ;  
+    	for (int i = 0; i < record.size(); i++) {
+    		objs[i]=record.get(i);
 		}
-		else if(etlTime !=null && fieldsHasher==null ) {
-			Integer pos = parseEtlTimeColumnPosition(etlTime, record.size());
-			if(pos>record.size()) pos=record.size();//单个字段，位置字段最多+1
-			String value = getCurrentDateTime();
-			//String[] re = ArrayUtils.insertElement(record, value, pos);
-			//return re;
-			
-			record.add(pos, value);
-			return record;
-		}
-		else if(etlTime ==null && fieldsHasher!=null ) {
-			Integer pos = parseFieldsHasherColumnPosition(fieldsHasher, record.size());
-			if(pos>record.size()) pos=record.size();//单个字段，位置字段最多+1			
-			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < record.size(); i++) {
-				sb=sb.append(",").append(record.get(i)==null?"null":record.get(i));
-			}
-			String val = DigestUtils.md5Hex(sb.toString());
-			record.add(pos, val);
-			return record;
-		}
-		else {
-			Integer etlPos = parseEtlTimeColumnPosition(etlTime, record.size());
-			String etlVal = getCurrentDateTime();
-			Integer hashPos = parseFieldsHasherColumnPosition(fieldsHasher, record.size());
-			String value = "";
-			for (int i = 0; i < record.size(); i++) {
-				value=value+"|"+record.get(i);
-			}
-			String hashVal = DigestUtils.md5Hex(value);
-			if(etlPos<=hashPos){
-				if(etlPos>record.size()) etlPos=record.size();//单个字段，位置字段最多+1
-				if(hashPos>record.size()) hashPos=record.size();//单个字段，位置字段最多+1
-				record.add(etlPos, etlVal);
-				record.add(hashPos+1, hashVal);
-			}
-			else {
-				if(etlPos>record.size()) etlPos=record.size();//单个字段，位置字段最多+1
-				if(hashPos>record.size()) hashPos=record.size();//单个字段，位置字段最多+1
-				record.add(hashPos, hashVal);
-				record.add(etlPos+1, etlVal);
-			}
-			return record;
-		}
+    	Object[] objsRecord = getRecordByEtlTimeAndFieldsHasher(etlTime, fieldsHasher, objs);
+		return objsRecord;
 	}
 	
 	
@@ -275,11 +234,8 @@ public class EtlTimeAndFieldsHasher {
 		record.add("b5");
 		
  
-		Record r2 = getRecordByEtlTimeAndFieldsHasher(etl_time, fields_hasher, record);
-		
-		for (int i = 0; i < r2.size(); i++) {
-			System.out.println("#######*******:"+r2.get(i));
-		}
+		Object[] r2 = getRecordByEtlTimeAndFieldsHasher(etl_time, fields_hasher, record);
+		 
 		
 	}
 

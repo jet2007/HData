@@ -23,6 +23,7 @@ import com.github.stuxuhai.hdata.plugin.utils.ExceptionProperties;
 import com.github.stuxuhai.hdata.plugin.utils.FtpUtils;
 import com.github.stuxuhai.hdata.plugin.utils.impl.FtpUtilsImpl;
 import com.github.stuxuhai.hdata.plugin.utils.impl.SFtpUtilsImpl;
+import com.github.stuxuhai.hdata.utils.EtlTimeAndFieldsHasher;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
@@ -44,8 +45,11 @@ public class FtpWriter extends Writer {
 	private String protocol;
 	private String writemode;
 	private String nullFormat;
+    private String etlTime ;
+    private String fieldsHasher ;
+	
+	
 	private int parallelism;
-	//private FTPClient ftpClient;
 	private FtpUtils ftp;
 	private BufferedWriter bw;
 	private String[] strArray;
@@ -82,7 +86,8 @@ public class FtpWriter extends Writer {
 		writemode = writerConfig.getString(FtpWriterProperties.WRITEMODE,FtpWriterProperties.WRITEMODE_DEFAULT);
 		//nullFormat = StringEscapeUtils.unescapeJava(writerConfig.getString(FtpWriterProperties.NULL_FORMAT, FtpWriterProperties.NULL_FORMAT_DEFAULT));
 		nullFormat =  writerConfig.getString(FtpWriterProperties.NULL_FORMAT, FtpWriterProperties.NULL_FORMAT_DEFAULT);
-
+        this.etlTime = writerConfig.getString(FtpWriterProperties.ETL_TIME);
+        this.fieldsHasher = writerConfig.getString(FtpWriterProperties.FIELDS_HASHER);
  
 		//ftpClient = FTPUtils.getFtpClient(host, port, username, password);
 		if(protocol.equals("ftp")){
@@ -136,12 +141,14 @@ public class FtpWriter extends Writer {
 
 	@Override
 	public void execute(Record record) {
+		Object[] objsRecord = EtlTimeAndFieldsHasher.getRecordByEtlTimeAndFieldsHasher(etlTime, fieldsHasher, record);
+		
 		if (strArray == null) {
-			strArray = new String[record.size()];
+			strArray = new String[objsRecord.length];
 		}
 
-		for (int i = 0, len = record.size(); i < len; i++) {
-			Object o = record.get(i);
+		for (int i = 0, len = objsRecord.length; i < len; i++) {
+			Object o = objsRecord[i];
 			if (o == null) {
 				strArray[i] = nullFormat;
 			} else {

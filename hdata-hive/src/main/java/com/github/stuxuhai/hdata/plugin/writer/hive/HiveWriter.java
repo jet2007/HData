@@ -32,6 +32,7 @@ import com.github.stuxuhai.hdata.api.Record;
 import com.github.stuxuhai.hdata.api.Writer;
 import com.github.stuxuhai.hdata.exception.HDataException;
 import com.github.stuxuhai.hdata.plugin.hive.HiveTypeUtils;
+import com.github.stuxuhai.hdata.utils.EtlTimeAndFieldsHasher;
 import com.google.common.base.Preconditions;
 import org.apache.hadoop.hive.conf.HiveConf;
 
@@ -43,6 +44,8 @@ public class HiveWriter extends Writer {
 	private RecordWriter<WritableComparable<?>, HCatRecord> writer;
 	private OutputCommitter committer;
 	private final List<String> columns = new ArrayList<>();
+    private String etlTime ;
+    private String fieldsHasher ;
 
 	@Override
 	public void prepare(JobContext context, PluginConfig writerConfig) {
@@ -56,6 +59,9 @@ public class HiveWriter extends Writer {
 		String hiveDatabase = writerConfig.getString(HiveWriterProperties.DATABASE, "default");
 		String hiveTable = writerConfig.getString(HiveWriterProperties.TABLE);
 		Preconditions.checkNotNull(hiveTable, "Hive writer requires property: table");
+		
+        this.etlTime = writerConfig.getString(HiveWriterProperties.ETL_TIME);
+        this.fieldsHasher = writerConfig.getString(HiveWriterProperties.FIELDS_HASHER);
 
 		if (writerConfig.containsKey(HiveWriterProperties.HADOOP_USER)) {
 			System.setProperty("HADOOP_USER_NAME", writerConfig.getString(HiveWriterProperties.HADOOP_USER));
@@ -147,10 +153,11 @@ public class HiveWriter extends Writer {
 
 	@Override
 	public void execute(Record record) {
-		HCatRecord hCatRecord = new DefaultHCatRecord(record.size());
+    	Object[] objsRecord = EtlTimeAndFieldsHasher.getRecordByEtlTimeAndFieldsHasher(etlTime, fieldsHasher, record);
+		HCatRecord hCatRecord = new DefaultHCatRecord(objsRecord.length);
 		int columnSize = columns.size();
-		for (int i = 0, len = record.size(); i < len; i++) {
-			Object item = record.get(i);
+		for (int i = 0, len = objsRecord.length; i < len; i++) {
+			Object item = objsRecord[i];
 			if (columnSize > i) {
 				hCatRecord.set(i, HiveTypeUtils.toJavaObjectSpecial(columns.get(i), item));
 			} else {

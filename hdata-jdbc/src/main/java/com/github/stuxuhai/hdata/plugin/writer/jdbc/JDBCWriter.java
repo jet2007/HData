@@ -48,8 +48,8 @@ public class JDBCWriter extends Writer {
     private String username;
     private String password ;
     
-    private String etlTime = null;
-    private String fieldsHasher = null;
+    private String etlTime ;
+    private String fieldsHasher ;
     private String presql;
     private String postsql;
     
@@ -67,11 +67,6 @@ public class JDBCWriter extends Writer {
         
         //根据etlTime和fieldsHasher，修正columns值
         this.columns = EtlTimeAndFieldsHasher.getColomnsByEtlTimeAndFieldsHasher(etlTime, fieldsHasher, columns);
-//        System.out.print("######## newColumns=[");
-//        for (int i = 0; i < newColumns.size(); i++) {
-//			System.out.print(newColumns.get(i)+",");
-//		}
-//        System.out.println("]");
         
         this.table = writerConfig.getString(JDBCWriterProperties.TABLE);
         Preconditions.checkNotNull(table, "JDBC writer required property: table");
@@ -187,11 +182,7 @@ public class JDBCWriter extends Writer {
 
     @Override
     public void execute(Record record) {
-    	Object[] objs= new Object[record.size()] ;  
-    	for (int i = 0; i < record.size(); i++) {
-    		objs[i]=record.get(i);
-		}
-    	Object[] objsRecord = EtlTimeAndFieldsHasher.getRecordByEtlTimeAndFieldsHasher(etlTime, fieldsHasher, objs);
+    	Object[] objsRecord = EtlTimeAndFieldsHasher.getRecordByEtlTimeAndFieldsHasher(etlTime, fieldsHasher, record);
     	
 //    	System.out.print("######## objsRecord=[");
 //    	for (int i = 0; i < objsRecord.length; i++) {

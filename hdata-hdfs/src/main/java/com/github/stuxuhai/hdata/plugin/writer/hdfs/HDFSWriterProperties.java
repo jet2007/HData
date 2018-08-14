@@ -16,6 +16,8 @@ public class HDFSWriterProperties {
 	//如果用户配置: nullFormat="\N"，那么如果源头数据是null字段,则写出数据为"\N"。
     public static final String NULL_FORMAT = "null.format"; 
     
+    public static final String ETL_TIME = "etl.time"; //etl_time:1
+    public static final String FIELDS_HASHER = "fields.hasher";//fields_hasher:2
     
     public static final String NULL_FORMAT_DEFAULT = "\\N";
     public static final String LINE_SEPARATOR_DEFAULT = "\n";

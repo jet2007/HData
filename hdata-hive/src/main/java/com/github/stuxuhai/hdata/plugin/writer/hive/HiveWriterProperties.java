@@ -9,4 +9,7 @@ public class HiveWriterProperties {
 	public static final String HADOOP_USER = "hadoop.user";
 	public static final String HDFS_CONF_PATH = "hdfs.conf.path";
 	public static final String HIVE_SETTINGS = "hive.settings";
+	
+    public static final String ETL_TIME = "etl.time"; //etl_time:1
+    public static final String FIELDS_HASHER = "fields.hasher";//fields_hasher:2
 }
