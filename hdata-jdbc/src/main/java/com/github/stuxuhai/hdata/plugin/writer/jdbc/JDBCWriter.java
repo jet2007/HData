@@ -24,6 +24,7 @@ import com.github.stuxuhai.hdata.api.Writer;
 import com.github.stuxuhai.hdata.common.Constants;
 import com.github.stuxuhai.hdata.exception.HDataException;
 import com.github.stuxuhai.hdata.plugin.jdbc.JdbcUtils;
+import com.github.stuxuhai.hdata.utils.EtlTimeAndFieldsHasher;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 
@@ -54,6 +55,9 @@ public class JDBCWriter extends Writer {
     private String username;
     private String password ;
     
+    private String etlTime = null;
+    private String fieldsHasher = null;
+    
 	//标记并发执行时，初始化与destroy的用途；例：写入FTP前的删除原文件；（这一个动作只执行一次）
 	private static AtomicInteger init_seq = new AtomicInteger(0);
 	private static AtomicInteger destroy_seq = new AtomicInteger(0);
@@ -63,6 +67,16 @@ public class JDBCWriter extends Writer {
         this.keywordEscaper = writerConfig.getProperty(JDBCWriterProperties.KEYWORD_ESCAPER, JDBCWriterProperties.KEYWORD_ESCAPER_DEFAULT);
         this.columns = context.getFields();
 
+        this.etlTime = writerConfig.getString(JDBCWriterProperties.ETL_TIME);
+        this.fieldsHasher = writerConfig.getString(JDBCWriterProperties.FIELDS_HASHER);
+        
+        Fields newColumns = EtlTimeAndFieldsHasher.getColomnsByEtlTimeAndFieldsHasher(etlTime, fieldsHasher, columns);
+        System.out.print("######## newColumns=[");
+        for (int i = 0; i < newColumns.size(); i++) {
+			System.out.print(newColumns.get(i)+",");
+		}
+        System.out.println("]");
+        
         this.table = writerConfig.getString(JDBCWriterProperties.TABLE);
         Preconditions.checkNotNull(table, "JDBC writer required property: table");
 
@@ -105,7 +119,6 @@ public class JDBCWriter extends Writer {
         } else if (this.columns != null) {
             insertColumns = this.columns;
         } else {
-
             insertColumns = null;
         }
         if (insertColumns != null) {
@@ -179,6 +192,18 @@ public class JDBCWriter extends Writer {
 
     @Override
     public void execute(Record record) {
+    	Object[] objs= new Object[record.size()] ;  
+    	for (int i = 0; i < record.size(); i++) {
+    		objs[i]=record.get(i);
+		}
+    	
+    	Object[] objsRecord = EtlTimeAndFieldsHasher.getRecordByEtlTimeAndFieldsHasher(etlTime, fieldsHasher, objs);
+    	System.out.print("######## objsRecord=[");
+    	for (int i = 0; i < objsRecord.length; i++) {
+			System.out.print(objsRecord[i]+",");
+		}
+    	System.out.println("]");
+    	
         try {
             if (statement == null) {
                 // TODO: statement must be prepared before execution
@@ -312,7 +337,4 @@ public class JDBCWriter extends Writer {
 		}
 	}
 	
-
-    
-    
 }

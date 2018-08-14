@@ -15,6 +15,10 @@ public class JDBCWriterProperties {
     public static final String PRE_SQL = "presql";
     public static final String POST_SQL = "postsql";
     
+    public static final String ETL_TIME = "etl.time"; //etl_time:1
+    public static final String FIELDS_HASHER = "fields_hasher";//hasher:2
+    
+    
     
     public static final String KEYWORD_ESCAPER_DEFAULT = "";
     public static final int BATCH_INSERT_SIZE_DEFAULT = 10000;

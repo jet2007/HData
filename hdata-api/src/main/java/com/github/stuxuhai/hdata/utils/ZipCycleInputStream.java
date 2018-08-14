@@ -1,4 +1,4 @@
-package com.github.stuxuhai.hdata.plugin.reader.csv;
+package com.github.stuxuhai.hdata.utils;
 
 /*
  * 使用com.alibaba.datax.plugin.unstructuredstorage.reader;

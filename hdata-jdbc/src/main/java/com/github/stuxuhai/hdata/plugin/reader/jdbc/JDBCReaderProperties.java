@@ -21,6 +21,8 @@ public class JDBCReaderProperties {
     public static final String NUMBER_FORMAT = "number.format";
     public static final String KEYWORD_ESCAPER = "keyword.escaper";
     
+    //public static final String ETL_TIME = "etl.time";
+    //public static final String FIELDS_HASHER = "fields_hasher";
     
     public static final String KEYWORD_ESCAPER_DEFAULT = "";
     public static final int MAX_SIZE_PER_FETCH_DEFAULT = 0;

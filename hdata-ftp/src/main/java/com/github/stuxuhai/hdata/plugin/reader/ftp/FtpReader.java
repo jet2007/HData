@@ -27,6 +27,8 @@ import com.github.stuxuhai.hdata.plugin.utils.ExceptionProperties;
 import com.github.stuxuhai.hdata.plugin.utils.FtpUtils;
 import com.github.stuxuhai.hdata.plugin.utils.impl.FtpUtilsImpl;
 import com.github.stuxuhai.hdata.plugin.utils.impl.SFtpUtilsImpl;
+import com.github.stuxuhai.hdata.utils.RecordUtils;
+import com.github.stuxuhai.hdata.utils.ZipCycleInputStream;
 
 public class FtpReader extends Reader {
 	private static final Logger LOGGER = LogManager.getLogger(FtpReader.class);
@@ -115,7 +117,7 @@ public class FtpReader extends Reader {
 					currentRow++;
 					if (currentRow >= startRow) {
 						String[] tokensOld = StringUtils.splitPreserveAllTokens(line, fieldsSeparator);
-						String[] tokens=getRecordByColumns(tokensOld);
+						String[] tokens=RecordUtils.getRecordByColumns(columns, tokensOld); 
 						if (tokens.length >= fieldsCount) {
 							Record record = new DefaultRecord(tokens.length);
 							for (String field : tokens) {
@@ -143,30 +145,7 @@ public class FtpReader extends Reader {
 		}
 	}
 	
-	
-	/*
-	 * 根据原输入与this.columns，返回选取的字段后的输入
-	 */
-	public String[]  getRecordByColumns(String[] tokens) {
-		if(this.columns == null || this.columns.isEmpty())
-			return tokens;
-		else {
-			String[] arr = this.columns.split("\\s*,\\s*");
-			String[] rec=new String[arr.length];
-			for (int i = 0; i < arr.length; i++) {
-				if(arr[i].startsWith("#"))
-					rec[i]=arr[i].substring(1);
-				else {
-					try {
-						rec[i]=tokens[Integer.parseInt(arr[i])-1];
-					} catch (Exception e) {
-						throw new HDataException(e);
-					}		
-				}
-			}
-			return rec;
-		}
-	}
+
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {

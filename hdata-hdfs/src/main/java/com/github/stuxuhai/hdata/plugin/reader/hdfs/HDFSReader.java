@@ -25,6 +25,7 @@ import com.github.stuxuhai.hdata.api.Record;
 import com.github.stuxuhai.hdata.api.RecordCollector;
 import com.github.stuxuhai.hdata.api.Splitter;
 import com.github.stuxuhai.hdata.exception.HDataException;
+import com.github.stuxuhai.hdata.utils.RecordUtils;
 
 public class HDFSReader extends Reader {
 
@@ -84,10 +85,10 @@ public class HDFSReader extends Reader {
 					br = new BufferedReader(new InputStreamReader(codec.createInputStream(input), encoding));
 				}
 				while ((line = br.readLine()) != null) {
-					String[] tokens = StringUtils.splitPreserveAllTokens(line, fieldsSeparator);
-					String[] tokensByColumns=getRecordByColumns(tokens);
-					Record record = new DefaultRecord( tokensByColumns.length);
-					for (String field : tokensByColumns) {
+					String[] tokensOld = StringUtils.splitPreserveAllTokens(line, fieldsSeparator);
+					String[] tokens=RecordUtils.getRecordByColumns(columns, tokensOld); //getRecordByColumns(tokens);
+					Record record = new DefaultRecord( tokens.length);
+					for (String field : tokens) {
 						if(!( this.nullFormat.equals(field) ) )
 							record.add(field);
 						else 
@@ -102,29 +103,7 @@ public class HDFSReader extends Reader {
 		}
 	}
 	
-	/*
-	 * 根据原输入与this.columns，返回选取的字段后的输入
-	 */
-	public String[]  getRecordByColumns(String[] tokens) {
-		if(this.columns == null || this.columns.isEmpty())
-			return tokens;
-		else {
-			String[] arr = this.columns.split("\\s*,\\s*");
-			String[] rec=new String[arr.length];
-			for (int i = 0; i < arr.length; i++) {
-				if(arr[i].startsWith("#"))
-					rec[i]=arr[i].substring(1);
-				else {
-					try {
-						rec[i]=tokens[Integer.parseInt(arr[i])-1];
-					} catch (Exception e) {
-						throw new HDataException(e);
-					}		
-				}
-			}
-			return rec;
-		}
-	}
+
 	
 
 	

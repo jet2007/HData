@@ -14,6 +14,5 @@ public class Fields extends ArrayList<String> {
 	public Fields(String... fields) {
 		super();
 		Collections.addAll(this, fields);
-	}
-
+	}	
 }

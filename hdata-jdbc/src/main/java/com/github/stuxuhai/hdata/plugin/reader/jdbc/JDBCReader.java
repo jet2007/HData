@@ -41,6 +41,9 @@ public class JDBCReader extends Reader {
     private String fieldWrapReplaceString = null;
     private DecimalFormat decimalFormat = null;
     private long sqlMetricTime = -1;
+    
+    //private String etlTime = null;
+    //private String fieldsHasher = null;
 
     private static final Logger LOGGER = LogManager.getLogger("sql-metric");
 
@@ -55,7 +58,9 @@ public class JDBCReader extends Reader {
         nullString = readerConfig.getString(JDBCReaderProperties.NULL_STRING);
         nullNonString = readerConfig.getString(JDBCReaderProperties.NULL_NON_STRING);
         fieldWrapReplaceString = readerConfig.getProperty(JDBCReaderProperties.FIELD_WRAP_REPLACE_STRING);
-
+        //etlTime = readerConfig.getString(JDBCReaderProperties.ETL_TIME);
+        //fieldsHasher = readerConfig.getString(JDBCReaderProperties.FIELDS_HASHER);
+        
         String numberFormat = readerConfig.getProperty(JDBCReaderProperties.NUMBER_FORMAT);
         if (numberFormat != null) {
             decimalFormat = new DecimalFormat(numberFormat);
