@@ -46,6 +46,10 @@
 - 样例3：HDFS写入的目录+压缩+单文件最大值
 
     /app/hdata-0.2.8/bin/hdata --reader jdbc -Rurl="jdbc:mysql://db.mysql.hotel.reader.001:3306/elp_demo?useUnicode=true&amp;characterEncoding=utf8" -Rdriver="com.mysql.jdbc.Driver" -Rusername="root" -Rpassword="123456" -Rkeyword.escaper="" -Rparallelism="1" -Rtable="elp_demo_100w" --writer hdfs -Whdfs.conf.path="/etc/hive/conf/hdfs-site.xml" -Wpath="hdfs://127.0.0.1:8020/user/hive/warehouse/elp_demo.db/elp_demo_hdfs__txt_gzip/0000_1533278874000.gz" -Wparallelism="1" -Whadoop.user="cloudera" -Wfields.separator="\001" -Wcompress.codec="org.apache.hadoop.io.compress.GzipCodec" -Wmax.file.size.mb="10"
+    
+- 样例4：HDFS写入的目录+etltime+fields_hasher
+
+    /app/hdata-0.2.8/bin/hdata --reader jdbc -Rurl="jdbc:mysql://192.168.101.200:3306/elp_demo?useUnicode=true&amp;characterEncoding=utf8" -Rdriver="com.mysql.jdbc.Driver" -Rusername="root" -Rpassword="123456" -Rkeyword.escaper="" -Rparallelism="1" -Rsql="select * from elp_demo_10w union all select * from elp_demo_10w order by 1 " --writer hdfs -Whdfs.conf.path="/etc/hive/conf/hdfs-site.xml" -Wpath="hdfs://127.0.0.1:8020/user/hive/warehouse/elp_demo.db/elp_demo_hdfs__txt/0000_1533275725000.txt" -Wparallelism="1" -Whadoop.user="cloudera" -Wfields.separator="\001"  -Wfields.hasher="" -Wetl.time="etl"    
 
 ### 3.2 Reader参数
 

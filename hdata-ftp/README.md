@@ -56,8 +56,9 @@
 	- 生成elp_demo_target_0000(0001,0003).gzip 3个文件
 	
  
+- 样例8：FTP写入-etltime+hash
 
-
+	/app/hdata-0.2.8/bin/hdata --reader jdbc -Rurl="jdbc:mysql://192.168.101.200:3306/elp_demo?useUnicode=true&amp;characterEncoding=utf8" -Rdriver="com.mysql.jdbc.Driver" -Rusername="root" -Rpassword="123456" -Rkeyword.escaper="" -Rparallelism="1" -Rsql="select * from elp_demo_10w union all select * from elp_demo_10w order by 1 "  --writer ftp -Whost="192.168.101.201" -Wport="2121" -Wusername="a" -Wpassword="a" -Wpath="/qqqqdssq1122.txt" -Wfields.separator=","   -Wprotocol="ftp"  -Wwritemode="overwrite" -Wfields.hasher="" -Wetl.time="etl"   
 
 
 

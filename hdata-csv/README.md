@@ -49,7 +49,10 @@
 	
 	/app/hdata-0.2.8/bin/hdata --reader csv -Rdir="/tmp/hdata" -Rfile="elp_demo_target_[\d]*.gz" -Rcolumns="1,#123,3,4,5,6,7,#abc123cde" -Rfields.separator="\t" -Rencoding="UTF-8" -Rcompress="gzip" -Rstart.row="1" -Rline.separator="\n" -Rnull.format="\\N" --writer jdbc -Wurl="jdbc:mysql://db.mysql.hotel.writer.002:3306/elp_demo?useUnicode=true&amp;characterEncoding=utf8" -Wdriver="com.mysql.jdbc.Driver" -Wusername="root" -Wpassword="123456" -Wkeyword.escaper="" -Wparallelism="1" -Wtable="elp_demo_target" -Wpresql="truncate table elp_demo.elp_demo_target;"
 	
-
+- 样例8：TXT写入-etltime+fields_hasher
+	
+	/app/hdata-0.2.8/bin/hdata --reader jdbc -Rurl="jdbc:mysql://192.168.101.200:3306/elp_demo?useUnicode=true&amp;characterEncoding=utf8" -Rdriver="com.mysql.jdbc.Driver" -Rusername="root" -Rpassword="123456" -Rkeyword.escaper="" -Rparallelism="1" -Rsql="select * from elp_demo_10w union all select * from elp_demo_10w order by 1 " --writer csv -Wpath="/tmp/hdata/1111.csv" -Wshow.columns="true" -Wwritemode="overwrite" -Wfields.hasher="" -Wetl.time="etl" 
+	
 
 
 ### 3.2 csvReader参数

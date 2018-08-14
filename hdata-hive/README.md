@@ -106,6 +106,19 @@ PARTITIONED BY (
 ,prov_id STRING  )
 stored as rcfile    ;
 
+
+CREATE TABLE elp_demo_hdfs_writer_etl_hash (
+  id int ,
+  it int ,
+  st string,
+  dt string,
+  dm string,
+  fl float  ,
+  de decimal(18,4)  ,
+  tx string,
+  etl_time string,
+  fields_hasher string
+);
 ```
 
 - 样例1：MYSQL读取-写入到HIVE(TEXTFILE)
@@ -127,6 +140,10 @@ stored as rcfile    ;
 - 样例5：MYSQL读取-写入到HIVE(分区[多个分区列])
 
     /app/hdata-0.2.8/bin/hdata --reader jdbc -Rurl="jdbc:mysql://db.mysql.hotel.reader.001:3306/elp_demo?useUnicode=true&amp;characterEncoding=utf8" -Rdriver="com.mysql.jdbc.Driver" -Rusername="root" -Rpassword="123456" -Rkeyword.escaper="" -Rparallelism="1" -Rtable="elp_demo_10w" --writer hive -Wmetastore.uris="thrift://127.0.0.1:9083" -Whdfs.conf.path="/etc/hive/conf/hdfs-site.xml" -Whadoop.user="cloudera" -Wdatabase="elp_demo" -Wparallelism="1" -Wtable="elp_demo_hdfs_writer_partitions" -Wpartitions="day_id=2017-01-02,prov_id=SH"
+    
+- 样例6：MYSQL读取-写入到HIVE(etltime+fields_hasher)
+
+    /app/hdata-0.2.8/bin/hdata --reader jdbc -Rurl="jdbc:mysql://192.168.101.200:3306/elp_demo?useUnicode=true&amp;characterEncoding=utf8" -Rdriver="com.mysql.jdbc.Driver" -Rusername="root" -Rpassword="123456" -Rkeyword.escaper="" -Rparallelism="1" -Rsql="select * from elp_demo_10w union all select * from elp_demo_10w order by 1 " --writer hive -Wmetastore.uris="thrift://127.0.0.1:9083" -Whdfs.conf.path="/etc/hive/conf/hdfs-site.xml" -Whadoop.user="cloudera" -Wdatabase="elp_demo" -Wparallelism="1" -Wtable="elp_demo_hdfs_writer_etl_hash"  -Wfields.hasher="" -Wetl.time="etl" 
 
 ### 3.2 Reader参数
 
