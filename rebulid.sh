@@ -7,12 +7,12 @@ mvn clean package -Pmake-package
 
 cd $DIR_BASE
 cd build
-chmod 777 hdata-0.2.8.tar.gz
+chmod 777 hdata-1.0.0.tar.gz
 
-rm -rf $APP/hdata-0.2.8.tar.gz
+rm -rf $APP/hdata-1.0.0.tar.gz
 cp hdata-0.2.8.tar.gz $APP
 
 cd $APP
-rm -rf hdata-0.2.8
-tar -xvf  hdata-0.2.8.tar.gz
-cp mysql-connector-java-5.1.45.jar hdata-0.2.8/plugins/jdbc/
+rm -rf hdata-1.0.0
+tar -xvf  hdata-1.0.0.tar.gz
+cp mysql-connector-java-5.1.45.jar hdata-1.0.0./plugins/jdbc/
