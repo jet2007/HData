@@ -70,12 +70,12 @@ public class JDBCWriter extends Writer {
         this.etlTime = writerConfig.getString(JDBCWriterProperties.ETL_TIME);
         this.fieldsHasher = writerConfig.getString(JDBCWriterProperties.FIELDS_HASHER);
         
-        Fields newColumns = EtlTimeAndFieldsHasher.getColomnsByEtlTimeAndFieldsHasher(etlTime, fieldsHasher, columns);
-        System.out.print("######## newColumns=[");
-        for (int i = 0; i < newColumns.size(); i++) {
-			System.out.print(newColumns.get(i)+",");
-		}
-        System.out.println("]");
+//        Fields newColumns = EtlTimeAndFieldsHasher.getColomnsByEtlTimeAndFieldsHasher(etlTime, fieldsHasher, columns);
+//        System.out.print("######## newColumns=[");
+//        for (int i = 0; i < newColumns.size(); i++) {
+//			System.out.print(newColumns.get(i)+",");
+//		}
+//        System.out.println("]");
         
         this.table = writerConfig.getString(JDBCWriterProperties.TABLE);
         Preconditions.checkNotNull(table, "JDBC writer required property: table");
@@ -196,7 +196,6 @@ public class JDBCWriter extends Writer {
     	for (int i = 0; i < record.size(); i++) {
     		objs[i]=record.get(i);
 		}
-    	
     	Object[] objsRecord = EtlTimeAndFieldsHasher.getRecordByEtlTimeAndFieldsHasher(etlTime, fieldsHasher, objs);
     	System.out.print("######## objsRecord=[");
     	for (int i = 0; i < objsRecord.length; i++) {
