@@ -99,7 +99,7 @@ public class EtlTimeAndFieldsHasher {
 			if(pos>record.length) pos=record.length;//单个字段，位置字段最多+1
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < record.length; i++) {
-				sb=sb.append(",").append(record[i].toString());
+				sb=sb.append(",").append(record[i]==null ? "null":record[i].toString());
 			}
 			String val = DigestUtils.md5Hex(sb.toString());
 			return ArrayUtils.insertElement(record, val, pos);
@@ -112,7 +112,7 @@ public class EtlTimeAndFieldsHasher {
 			
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < record.length; i++) {
-				sb=sb.append(",").append(record[i].toString());
+				sb=sb.append(",").append(record[i]==null ? "null":record[i].toString());
 			}
 			String hashVal = DigestUtils.md5Hex(sb.toString());
 			if(etlPos<=hashPos){
@@ -154,7 +154,7 @@ public class EtlTimeAndFieldsHasher {
 			if(pos>record.size()) pos=record.size();//单个字段，位置字段最多+1			
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < record.size(); i++) {
-				sb=sb.append(",").append(record.get(i));
+				sb=sb.append(",").append(record.get(i)==null?"null":record.get(i));
 			}
 			String val = DigestUtils.md5Hex(sb.toString());
 			record.add(pos, val);
