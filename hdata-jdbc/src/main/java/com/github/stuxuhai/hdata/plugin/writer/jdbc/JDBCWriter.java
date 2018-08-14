@@ -29,14 +29,9 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 
 public class JDBCWriter extends Writer {
-
-
     private static final Logger LOG = LogManager.getLogger(JDBCWriter.class);
-
     private final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(Constants.DATE_FORMAT_STRING);
-
     private Connection connection;
-    //private Connection conn_init_destroy;
     private PreparedStatement statement;
     private int count;
     private int batchInsertSize;
@@ -45,8 +40,6 @@ public class JDBCWriter extends Writer {
     private List<String> upsertColumns;
     private String table;
     private String keywordEscaper;
-    private String presql;
-    private String postsql;
     private int parallelism;
     private Map<String, Integer> columnTypes;
     
@@ -57,6 +50,8 @@ public class JDBCWriter extends Writer {
     
     private String etlTime = null;
     private String fieldsHasher = null;
+    private String presql;
+    private String postsql;
     
 	//标记并发执行时，初始化与destroy的用途；例：写入FTP前的删除原文件；（这一个动作只执行一次）
 	private static AtomicInteger init_seq = new AtomicInteger(0);
@@ -70,7 +65,8 @@ public class JDBCWriter extends Writer {
         this.etlTime = writerConfig.getString(JDBCWriterProperties.ETL_TIME);
         this.fieldsHasher = writerConfig.getString(JDBCWriterProperties.FIELDS_HASHER);
         
-//        Fields newColumns = EtlTimeAndFieldsHasher.getColomnsByEtlTimeAndFieldsHasher(etlTime, fieldsHasher, columns);
+        //根据etlTime和fieldsHasher，修正columns值
+        this.columns = EtlTimeAndFieldsHasher.getColomnsByEtlTimeAndFieldsHasher(etlTime, fieldsHasher, columns);
 //        System.out.print("######## newColumns=[");
 //        for (int i = 0; i < newColumns.size(); i++) {
 //			System.out.print(newColumns.get(i)+",");
@@ -99,7 +95,6 @@ public class JDBCWriter extends Writer {
         
 		//并行处理前，执行一次INIT操作（只1次）；
 		parallelism = writerConfig.getParallelism();
-		
 		this.presql = writerConfig.getString(JDBCWriterProperties.PRE_SQL);
 		this.postsql = writerConfig.getString(JDBCWriterProperties.POST_SQL);
 		//初始化业务
@@ -197,6 +192,7 @@ public class JDBCWriter extends Writer {
     		objs[i]=record.get(i);
 		}
     	Object[] objsRecord = EtlTimeAndFieldsHasher.getRecordByEtlTimeAndFieldsHasher(etlTime, fieldsHasher, objs);
+    	
     	System.out.print("######## objsRecord=[");
     	for (int i = 0; i < objsRecord.length; i++) {
 			System.out.print(objsRecord[i]+",");
@@ -204,8 +200,20 @@ public class JDBCWriter extends Writer {
     	System.out.println("]");
     	
         try {
+        	
             if (statement == null) {
-                // TODO: statement must be prepared before execution
+                prepareStatement(buildInsertSql(table, objsRecord.length, this.upsertColumns));
+            }
+            for (int i = 0, len = objsRecord.length; i < len; i++) {
+                if (objsRecord[i] instanceof Timestamp && !Integer.valueOf(Types.TIMESTAMP).equals(columnTypes.get(columns.get(i).toLowerCase()))) {
+                    statement.setObject(i + 1, DATE_FORMAT.format(objsRecord[i]));
+                } else {
+                    statement.setObject(i + 1, objsRecord[i]);
+                }
+            }
+        	
+        	/* 原生的语句
+            if (statement == null) {
                 prepareStatement(buildInsertSql(table, record.size(), this.upsertColumns));
             }
 
@@ -216,6 +224,7 @@ public class JDBCWriter extends Writer {
                     statement.setObject(i + 1, record.get(i));
                 }
             }
+            */
 
             count++;
             statement.addBatch();
