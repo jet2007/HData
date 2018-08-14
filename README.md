@@ -108,35 +108,11 @@ job.xml
 
 无配置参数，一般仅用于测试
 
-* jdbc
-
-参数        | 是否必选   | 描述                    |
------------| ----- | ---------------------------------------- |
-driver|是|JDBC驱动类名，如：com.mysql.jdbc.Driver|
-url|是|JDBC连接地址，如: jdbc:mysql://localhost:3306/db|
-username|是|数据库用户名|
-password|是|数据库密码|
-table|是|表名（包含数据库名或schema名），如：db.table，也支持分表，例如:table[001-100]|
-columns|否|字段名，多个字段用逗号“,”分隔。不填则选取所有字段。|
-exclude.columns|否|排除的字段名，多个字段用逗号“,”分隔|
-where|否|查询条件，如：day=’20140418’|
-sql|否|自定义查询SQL|
-split.by|否|并行读取切分的字段|
-max.size.per.fetch|否|单次执行SQL获取的最多记录数|
-null.string|否|替换当字符串类型的字段值为NULL时的值|
-null.non.string|否|替换当非字符串类型的字段值为NULL时的值|
-field.wrap.replace.string|否|若字符串字段中存在换行符时需要替换的值|
-number.format|否|小数类型字段的输出格式|
-keyword.escaper|否|关键字转义字符，默认为\`|
+* jdbc(见子目录)
 
 * hive(见子目录)
 
- 
-
-
 * hdfs(见子目录)
-
- 
 
 * hbase(见子目录)
 
@@ -177,13 +153,7 @@ schema|否|输出的字段定义，如：id,start_ip,end_ip|
 uri|是|MongoDB连接地址，如：mongodb://localhost/test.ip|
 query|否|查询语句，如：{"city":"XXX"}|
 
-* csv
-
-参数        | 是否必选   | 描述                    |
------------| ----- | ---------------------------------------- |
-path|是|本地文件路径|
-start.row|否|数据起始行数，默认：1|
-encoding|否|编码，默认：UTF-8|
+* csv(见子目录)
 
 * excel
 
@@ -195,33 +165,17 @@ include.column.names|否|是否包含列名，默认：false|
 
 #### 【Writer配置参数】
 
-* jdbc
-
-参数        | 是否必选   | 描述                    |
------------| ----- | ---------------------------------------- |
-driver|是|JDBC驱动类名，如：com.mysql.jdbc.Driver|
-url|是|JDBC连接地址，如: jdbc:mysql://localhost:3306/db|
-username|是|数据库用户名|
-password|是|数据库密码|
-table|是|表名（包含数据库名或schema名），如：db.table|
-batch.insert.size|否|批量插入的记录数，默认值：10000|
-schema|否|字段名配置，一般用于writer和reader的字段名不一致时|
-keyword.escaper|否|关键字转义字符，默认为\`|
-upsert.columns|否|指定 Upsert 的字段列表，逗号分隔，目前仅支持 Mysql，默认为空(即不启用 upsert)|
-presql|否|presql|
-postsql|否|postsql|
+* jdbc(见子目录)
 
 * hive(见子目录)
 
- 
-
 * hdfs(见子目录)
-
- 
 
 * hbase(见子目录)
 
- 
+* ftp(见子目录)
+
+* csv(见子目录)
 
 * kafka
 
@@ -232,9 +186,7 @@ fields.separator|否|字段分隔符，默认\t|
 
 其他配置请参考：[Kafka Configuration](https://kafka.apache.org/documentation/#configuration)
 
-* ftp(见子目录)
 
- 
 
 * mongodb
 
@@ -243,13 +195,8 @@ fields.separator|否|字段分隔符，默认\t|
 uri|是|MongoDB连接地址，如：mongodb://localhost/test.ip|
 query|否|查询语句，如：{"city":"XXX"}|
 
-* csv
 
-参数        | 是否必选   | 描述                    |
------------| ----- | ---------------------------------------- |
-path|是|本地文件路径|
-separator|否|字段分隔符，默认逗号","|
-encoding|否|编码，默认：UTF-8|
+
 
 * excel
 
