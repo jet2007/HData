@@ -219,33 +219,4 @@ public class JdbcUtils {
         return DriverManager.getConnection(url, username, password);
     }
     
-//    
-//    public static void main(String[] args) {
-//    	try {
-//			Connection conn = getConnection("com.mysql.jdbc.Driver","jdbc:mysql://192.168.101.200:3306/test","root","123456");
-//			Statement sm = conn.createStatement();
-//			String sql1="  UPDATE   tables2 SET  DATA_LENGTH=1+DATA_LENGTH  WHERE AVG_ROW_LENGTH=2179 ;";
-//			String sql2="    UPDATE   tables2   SET  INDEX_LENGTH=2+INDEX_LENGTH    WHERE AVG_ROW_LENGTH=2179 ;";
-//			
-//			String sql=sql1+sql2+sql1+sql2;
-//			String[] sqls = sql.split(";");
-//			for (int i = 0; i < sqls.length; i++) {
-//				if(sqls[i].trim().length()>0)
-//					sm.addBatch(sqls[i]);
-//			} {
-//				
-//			}
-//			
-//			  int[] a = sm.executeBatch();
-// 
-//			System.out.println(a);
-//			sm.close();
-//			conn.close();
-//    	
-//    	} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//	}
-    
 }
