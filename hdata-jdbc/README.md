@@ -12,6 +12,7 @@
 ## 3 功能说明
 
 
+
 ### 3.1 配置样例
 
 
@@ -79,6 +80,17 @@ etl.time|否|含义为增加一列值为系统当前时间；格式为"字段名
 fields.hasher|否|含义为增加一列值为reader的行记录的hash值；格式为"字段名称:字段位置"；其中字段位置有2种格式（设reader有id,name,val三个字段）；第1种"+N",视为最后一列后添加新列，即是id,name,val,fields_hasher(N+1); 第2种"N",视为在第N列之前添加 新列，即id,fields_hasher,name,val(N=2); 若schema有值，应本包含本字段； 1、默认值为空，视为无此列；2、当设为""时，等价于"fields_hasher:+1"；3、当设值为"hasher"时，等价于"hasher:+1";|4、示例"hasher:2","hasher:+2"|
  
 * parallelism：适当增加并发值，可提高写入速度；
+
+### 3.4 jar包
+- 目录plugins/jdbc
+- 关系数据库的jar包，如sql server的jar包：sqljdbc4-4.0.jar
+- hive jdbc(hiveserver2连接)使用的jar (下面示例cdh5.7.0版本，亦可选择apache,cdh,hdp等大数据的包)
+```
+hadoop-common-2.6.0-cdh5.7.0.jar,log4j-1.2.17.jar,hive-service-1.1.0-cdh5.7.0.jar
+,hive-jdbc-1.1.0-cdh5.7.0.jar,libfb303-0.9.2.jar,slf4j-log4j12.jar,commons-dbutils-1.6.jar
+,hive-exec-1.1.0-cdh5.7.0.jar,httpcore-4.2.5.jar,slf4j-api-1.7.5.jar
+,commons-logging-1.1.3.jar,hive-metastore-1.1.0-cdh5.7.0.jar,httpclient-4.2.5.jar
+```
 
 
 ## 4 FAQ
