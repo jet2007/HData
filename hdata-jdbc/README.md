@@ -82,9 +82,9 @@ fields.hasher|否|含义为增加一列值为reader的行记录的hash值；格�
 * parallelism：适当增加并发值，可提高写入速度；
 
 ### 3.4 jar包
-- 目录plugins/jdbc
-- 关系数据库的jar包，如sql server的jar包：sqljdbc4-4.0.jar
-- hive jdbc(hiveserver2连接)使用的jar (下面示例cdh5.7.0版本，亦可选择apache,cdh,hdp等大数据的包)
+- COPY JAR包到编译后的目录plugins/jdbc
+- 关系数据库的jar包，如sqljdbc4-4.0.jar(SQLSERVER)，ojdbc6-11.2.0.3.jar(ORACLE)
+- 使用jdbc reader替代hive的reader(hiveserver2连接)使用的jar (下面示例cdh5.7.0版本，亦可选择apache,cdh,hdp等大数据的包)
 ```
 hadoop-common-2.6.0-cdh5.7.0.jar,log4j-1.2.17.jar,hive-service-1.1.0-cdh5.7.0.jar
 ,hive-jdbc-1.1.0-cdh5.7.0.jar,libfb303-0.9.2.jar,slf4j-log4j12.jar,commons-dbutils-1.6.jar
